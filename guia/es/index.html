@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>otimizevideo — 30 minutos se convierten en 2, sin que el modelo elija los cortes</title>
+<meta content="CLI que condensa videos largos en ~2 minutos. El modelo puntúa unidades numeradas; el código convierte el id en tiempo y recorta. Proveedores intercambiables por fase." name="description"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<style>
+  :root{
+    --bg:#0c0c10; --bg2:#14141b; --card:#16161e; --line:#272730;
+    --txt:#e9e9ee; --mut:#9a9aa6; --amb:#E2A23B; --amb2:#f0c070; --sky:#38bdf8; --pro:#cbd5e1;
+    color-scheme:dark;
+  }
+  body.light{
+    --bg:#f6f7f9; --bg2:#eceef2; --card:#ffffff; --line:#e1e3ea;
+    --txt:#1a1a22; --mut:#5b5b68; --amb:#b9791d; --amb2:#a16207; --sky:#0369a1; --pro:#b45309;
+    color-scheme:light;
+  }
+  body.light .hero .glow{opacity:.5}
+  body.light pre{background:#0e0e14;color:#d6d6e0}
+  body.light pre .c{color:#8a8a98}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.65 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:Sora,sans-serif;line-height:1.15;margin:0}
+  a{color:var(--amb);text-decoration:none}
+  code,pre{font-family:"JetBrains Mono",monospace}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 22px}
+  .mut{color:var(--mut)} .amb{color:var(--amb)}
+  .chip{display:inline-block;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amb);font-weight:600;font-family:Sora}
+  nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);background:rgba(12,12,16,.78);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:22px;height:60px}
+  nav .brand{display:flex;align-items:center;gap:8px;font-family:Sora;font-weight:800;letter-spacing:-.02em;color:var(--amb)}
+  nav .brand .emoji{font-size:1.25rem}
+  nav .sep{color:var(--mut);opacity:.45}
+  nav .inema{color:var(--sky);font-weight:600;font-size:.88rem;font-family:Sora}
+  nav .inema:hover{filter:brightness(1.15)}
+  nav .pro{color:var(--pro);font-weight:600;font-size:.88rem;font-family:Sora}
+  nav .pro:hover{filter:brightness(1.15)}
+  nav .clubpro{display:inline-flex;align-items:center;gap:6px}
+  nav .links{margin-left:auto;display:flex;align-items:center;gap:20px;font-size:.92rem}
+  nav .links a.sec{color:var(--mut)} nav .links a.sec:hover{color:var(--txt)}
+  .tgl{background:var(--bg2);border:1px solid var(--line);color:var(--txt);width:38px;height:38px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:1.05rem}
+  .tgl:hover{border-color:var(--amb)}
+  .btn{display:inline-block;background:var(--amb);color:#1a1206;font-weight:600;padding:.6em 1.05em;border-radius:10px;font-family:Sora}
+  .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
+  @media(max-width:760px){nav .links a.sec{display:none}}
+  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+  .hero .glow{position:absolute;inset:-40% -20% auto auto;width:70%;height:600px;background:radial-gradient(closest-side,rgba(226,162,59,.22),transparent 70%);pointer-events:none}
+  .hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:74px 22px}
+  .hero h1{font-size:clamp(2.2rem,5vw,3.5rem);font-weight:800;letter-spacing:-.025em}
+  .hero p.lead{font-size:1.18rem;color:var(--mut);margin:1.1em 0 1.6em;max-width:34ch}
+  .hero .cta{display:flex;gap:12px;flex-wrap:wrap}
+  .hero figure{margin:0;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px -30px #000}
+  .hero figure img{width:100%;display:block}
+  @media(max-width:780px){.hero .wrap{grid-template-columns:1fr;padding:48px 22px}}
+  section{padding:62px 0;border-bottom:1px solid var(--line)}
+  section h2{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:800;letter-spacing:-.02em}
+  section .sub{color:var(--mut);margin:.6em 0 2em;max-width:62ch}
+  .grid{display:grid;gap:16px}
+  .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:820px){.g3,.g4{grid-template-columns:1fr 1fr}}
+  @media(max-width:540px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .card h3{font-size:1.05rem;margin-bottom:.4em}
+  .card p{color:var(--mut);font-size:.92rem;margin:0}
+  .num{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;border-radius:8px;background:rgba(226,162,59,.14);color:var(--amb);font-family:Sora;font-weight:800;font-size:.9rem;margin-bottom:.7em}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+  .flow span{background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:.45em .9em;font-size:.85rem;font-family:Sora;font-weight:600}
+  .flow .arr{color:var(--amb);border:none;background:none;padding:0 .1em}
+  pre{background:#0a0a0e;border:1px solid var(--line);border-radius:12px;padding:16px 18px;overflow:auto;font-size:.86rem;line-height:1.6;color:#d6d6e0}
+  pre .c{color:#6f6f7c} pre .k{color:var(--amb2)} pre .s{color:#9ece6a}
+  .step{display:grid;grid-template-columns:46px 1fr;gap:16px;margin-bottom:26px}
+  .step .b{width:46px;height:46px;border-radius:12px;background:var(--amb);color:#1a1206;font-family:Sora;font-weight:800;font-size:1.25rem;display:flex;align-items:center;justify-content:center}
+  .step h3{font-size:1.12rem;margin-bottom:.3em}
+  .step p{color:var(--mut);margin:.2em 0 .7em}
+  .ex{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:680px){.ex{grid-template-columns:1fr}}
+  .ex figure{margin:0;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+  .ex figure img{width:100%;display:block}
+  .ex figcaption{padding:12px 14px;font-size:.88rem;color:var(--mut);background:var(--card)}
+  .phase{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+  .phase:last-child{border:none}
+  .phase .tag{flex:0 0 92px;font-family:Sora;font-weight:800;color:var(--amb)}
+  .phase .d strong{display:block;margin-bottom:.2em}
+  .phase .d span{color:var(--mut);font-size:.92rem}
+  footer{padding:46px 0;text-align:center;color:var(--mut);font-size:.9rem}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:.3em .8em;font-size:.78rem;color:var(--mut);margin:0 4px}
+</style>
+<link href="https://inematds.github.io/otimizevideo/guia/" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/otimizevideo/guia/en/" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/otimizevideo/guia/es/" hreflang="es" rel="alternate"/></head>
+<body><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="../en/" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="./" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">ES</a></div>
+<nav><div class="wrap">
+<a class="brand" href="#top"><span class="emoji">✂️</span> otimizevideo</a>
+<span class="sep">|</span>
+<span class="clubpro">
+<a class="inema" href="https://inema.club" rel="noopener" target="_blank">INEMA.CLUB</a>
+<span class="sep">-</span>
+<a class="pro" href="https://inema.pro" rel="noopener" target="_blank">PRO</a>
+</span>
+<div class="links">
+<a class="sec" href="#oque">Qué es</a>
+<a class="sec" href="#fluxo">Cómo funciona</a>
+<a class="sec" href="#guia">Guía de uso</a>
+<a class="sec" href="#exemplos">Ejemplos</a>
+<a class="sec" href="#roadmap">Hoja de ruta</a>
+<button aria-label="Cambiar tema" class="tgl" id="themeToggle" title="Cambiar tema">🌙</button>
+<a class="btn" href="https://github.com/inematds/otimizevideo" rel="noopener" target="_blank">GitHub</a>
+</div>
+</div></nav>
+<header class="hero" id="top">
+<div class="glow"></div>
+<div class="wrap">
+<div>
+<span class="chip">CLI · Python · ffmpeg</span>
+<h1>30 minutos se convierten en 2 — y el modelo <span class="amb">nunca</span> elige dónde cortar</h1>
+<p class="lead">O <code>otv</code> transcribe, divide el habla en unidades numeradas y solo le pide al modelo una nota de 0 a 10 por id. El código es el que convierte el id en segundos y corta; por eso el corte nunca cae en medio de una palabra y ejecutar dos veces da el mismo resultado.</p>
+<div class="cta">
+<a class="btn" href="#guia">Comenzar la guía</a>
+<a class="btn ghost" href="https://github.com/inematds/otimizevideo" rel="noopener" target="_blank">Ver en GitHub</a>
+</div>
+</div>
+<figure><img alt="Portada del proyecto otimizevideo" src="../assets/hero.png"/></figure>
+</div>
+</header>
+<section id="oque"><div class="wrap">
+<span class="chip">Qué es</span>
+<h2>Un cortador de video cuyas decisiones son auditables</h2>
+<p class="sub">Una clase, un podcast o una conferencia de 20 a 30 minutos entran; sale un <code>output.mp4</code> de unos dos minutos con el mejor contenido. Cada fase guarda un JSON que puedes leer, editar y volver a renderizar sin gastar nada.</p>
+<div class="grid g3">
+<div class="card"><h3>🎯 El modelo puntúa, no corta</h3><p>Ve <code>[042] 4.2s talking_head "texto"</code> y devuelve una puntuación. El tiempo se obtiene de la transcripción con marcas de tiempo por palabra, así que el límite del corte coincide con el límite de una palabra real: nunca es una marca de tiempo inventada.</p></div>
+<div class="card"><h3>🔁 Determinista y barato de rehacer</h3><p>La selección (mochila por nota, cuota por tema, anclas de gancho y cierre, cohesión) es código. Incluso <code>notas.json</code>, incluso <code>plan.json</code>. Editar el plan a mano y volver a renderizar no cuesta ninguna llamada al modelo.</p></div>
+<div class="card"><h3>🔌 Proveedor intercambiable por fase</h3><p>Transcripción con Groq o Whisper local; puntuación con GLM, Gemini, Ollama o el propio Claude Code; TTS con inemavox o ElevenLabs; imagen con flux-2-klein. Una línea en el <code>config.yaml</code> o un flag.</p></div>
+</div>
+</div></section>
+<section id="fluxo"><div class="wrap">
+<span class="chip">Cómo funciona</span>
+<h2>Nueve fases, un JSON entre cada una</h2>
+<p class="sub">Cada fase lee el artefacto de la anterior y guarda el suyo. Volver a ejecutar una fase no repite las demás, y se reutiliza lo que ya existe, a menos que pidas <code>--forcar</code>.</p>
+<div class="flow">
+<span>ingest</span><span class="arr">→</span>
+<span>transcribir</span><span class="arr">→</span>
+<span>escenas</span><span class="arr">→</span>
+<span>clasificar</span><span class="arr">→</span>
+<span>unidades</span><span class="arr">→</span>
+<span>puntuar</span><span class="arr">→</span>
+<span>seleccionar</span><span class="arr">→</span>
+<span>narrar</span><span class="arr">→</span>
+<span>renderizar</span>
+</div>
+<div class="grid g3" style="margin-top:26px">
+<div class="card"><h3>Modo A — condensado</h3><p>El estándar. Mantiene al presentador y corta solo lo que funciona. Variante A+ (<code>--substituir gerado</code>) cambia los segmentos del presentador por ilustraciones generadas y <strong>conserva el audio original</strong>.</p></div>
+<div class="card"><h3>Modo B — sin presentador</h3><p>Se queda solo con las diapositivas, la demo de pantalla y los gráficos; el modelo redacta un guion en PT-BR y lo narra con TTS, mientras el audio original queda como fondo a −18 dB.</p></div>
+<div class="card"><h3>Modo C — solo visual</h3><p>La misma selección del B, sin la capa de narración, para cuando el material visual ya se explica por sí solo.</p></div>
+</div>
+</div></section>
+<section id="pre"><div class="wrap">
+<span class="chip">Requisitos previos</span>
+<h2>Lo que necesitas en la máquina</h2>
+<p class="sub">Nada de contenedores ni builds. Python 3.12, ffmpeg y las claves en los <code>.env</code> de siempre.</p>
+<div class="grid g3">
+<div class="card"><h3>ffmpeg y ffprobe</h3><p>Se encargan de todo el corte, la mezcla de audio y el titular. El render se ejecuta dentro de un scope con un límite de memoria.</p><pre><span class="c"># Debian/Ubuntu</span>
+<span class="k">sudo apt install</span> ffmpeg</pre></div>
+<div class="card"><h3>Dependencias de Python</h3><p>yt-dlp para descargar, PySceneDetect para encontrar los cortes, mediapipe y OpenCV para detectar rostros.</p><pre><span class="c"># en la raíz del proyecto</span>
+<span class="k">pip install -r</span> requirements.txt</pre></div>
+<div class="card"><h3>Claves de API</h3><p>Leídas en runtime de <code>~/projetos/openpcbotv2/.env</code> e <code>~/projetos/wifi/.env</code>. Ninguna clave se copia al proyecto.</p><pre><span class="c"># lo que se usa</span>
+GROQ_API_KEY
+OPENROUTER_API_KEY
+FAL_KEY  <span class="c"># solo en el modo A+</span></pre></div>
+</div>
+</div></section>
+<section id="guia"><div class="wrap">
+<span class="chip">Guía de uso · paso a paso</span>
+<h2>Del enlace al corte de dos minutos</h2>
+<p class="sub">Todos los comandos de abajo son reales y se ejecutaron durante la validación integral. El <code>&lt;id&gt;</code> es el nombre de la carpeta creada en <code>trabalho/</code>.</p>
+<div class="step"><div class="b">1</div><div>
+<h3>Ejecuta todo el pipeline</h3>
+<p>Una línea lo hace todo: descarga, transcribe, detecta escenas, puntúa, selecciona y renderiza. El resultado se copia a <code>~/projetos/output/otimizevideo/&lt;id&gt;/</code>.</p>
+<pre><span class="k">python3 otv.py run</span> <span class="s">"https://www.youtube.com/watch?v=..."</span> --modo A --alvo 120</pre>
+</div></div>
+<div class="step"><div class="b">2</div><div>
+<h3>Mira qué se eligió</h3>
+<p>O <code>status</code> enumera los artefactos, el titular y cada segmento con tiempo, duración y clasificación visual.</p>
+<pre><span class="k">python3 otv.py status</span> &lt;id&gt;  <span class="c"># plan: modo A · 136.6s en 18 segmentos</span></pre>
+</div></div>
+<div class="step"><div class="b">3</div><div>
+<h3>Revisa el gasto</h3>
+<p>Cada fase registra el tiempo y el costo en <code>trabalho/&lt;id&gt;/custos.json</code>. Una condensación típica cuesta unos centavos de dólar.</p>
+<pre><span class="k">python3 otv.py custo</span> &lt;id&gt;  <span class="c"># total US$0.0023</span></pre>
+</div></div>
+<div class="step"><div class="b">4</div><div>
+<h3>¿No te gustó un fragmento? Edita el plan</h3>
+<p>Abre el <code>plan.json</code>, elimina o ajusta un segmento y vuelve a renderizar. <strong>No se realiza ninguna llamada a modelos</strong> — el corte manual es gratis.</p>
+<pre><span class="k">$EDITOR</span> trabalho/&lt;id&gt;/plan.json
+<span class="k">python3 otv.py render</span> &lt;id&gt;</pre>
+</div></div>
+<div class="step"><div class="b">5</div><div>
+<h3>Cambia el proveedor de una sola fase</h3>
+<p>Las fases son independientes: volver a puntuar con otro modelo no repite la transcripción ni la descarga.</p>
+<pre><span class="k">python3 otv.py pontuar</span> &lt;id&gt; --provedor gemini --forcar
+<span class="k">python3 otv.py selecionar</span> &lt;id&gt; &amp;&amp; <span class="k">python3 otv.py render</span> &lt;id&gt;</pre>
+</div></div>
+<div class="step"><div class="b">6</div><div>
+<h3>Modo B — video sin presentador, con narración</h3>
+<p>Se queda solo con las diapositivas, la demo y los gráficos. Necesita la clasificación visual del modelo, así que pasa <code>--visual</code>.</p>
+<pre><span class="k">python3 otv.py run</span> <span class="s">"&lt;url&gt;"</span> --modo B --visual glm  <span class="c"># roteiro.md + narracao/*.wav</span></pre>
+</div></div>
+<div class="step"><div class="b">7</div><div>
+<h3>Modo A+ — el presentador se convierte en ilustración</h3>
+<p>Cada segmento con un rostro se reemplaza por una imagen generada con un efecto Ken Burns lento. El audio sigue siendo el original, así que el habla no cambia.</p>
+<pre><span class="k">python3 otv.py run</span> <span class="s">"&lt;url&gt;"</span> --modo A --visual glm --substituir gerado</pre>
+</div></div>
+</div></section>
+<section id="exemplos"><div class="wrap">
+<span class="chip">Ejemplos</span>
+<h2>Ejecutado en un video real de 20 minutos</h2>
+<p class="sub">Fuente de 1206 s en inglés sobre longevidad e IA, condensada a 136,6 s en 18 segmentos por US$0,0023 de modelo. El render tarda 21 segundos.</p>
+<div class="ex">
+<figure><img alt="Fotograma de un fragmento reemplazado por una ilustración en el modo A+" src="../assets/ex1.jpg"/><figcaption>Modo A+: el segmento del presentador se convirtió en una naturaleza muerta conceptual generada por IA; el audio sigue siendo el original.</figcaption></figure>
+<figure><img alt="Fotograma de un fragmento conservado del video original" src="../assets/ex2.jpg"/><figcaption>Un segmento conservado de la fuente: corte con precisión de fotograma, que empieza y termina en el límite de una palabra.</figcaption></figure>
+</div>
+</div></section>
+<section id="roadmap"><div class="wrap">
+<span class="chip">Hoja de ruta</span>
+<h2>Dónde está el proyecto</h2>
+<p class="sub">El pipeline está implementado y validado de principio a fin. Lo que sigue es escalar y definir el formato.</p>
+<div class="phase"><div class="tag">Listo</div><div class="d"><strong>Pipeline completo, modos A, A+, B y C</strong><span>Nueve fases, CLI con fase individual, 110 pruebas, validación integral documentada en la spec.</span></div></div>
+<div class="phase"><div class="tag">Listo</div><div class="d"><strong>Robustez del renderizado</strong><span>Una entrada de ffmpeg por segmento y un límite de memoria: antes, un único filtergraph llegaba a 60,9 GB y bloqueaba la máquina.</span></div></div>
+<div class="phase"><div class="tag">Siguiente</div><div class="d"><strong>Salida 9:16 y por lotes</strong><span>Corte vertical para Reels y Shorts, y una playlist entera con un solo comando.</span></div></div>
+<div class="phase"><div class="tag">Idea</div><div class="d"><strong>Modo A+ con b-roll real</strong><span>Reemplazar al presentador por un video de archivo en lugar de una imagen estática.</span></div></div>
+</div></section>
+<footer>
+<div class="wrap">
+<div class="pill">Python 3.12</div><div class="pill">ffmpeg</div><div class="pill">PySceneDetect</div><div class="pill">Groq Whisper</div><div class="pill">OpenRouter</div>
+<p style="margin-top:18px">otimizevideo · el modelo puntúa, el código corta ·
+      <a href="https://github.com/inematds/otimizevideo">inematds/otimizevideo</a> ·
+      <a href="https://inema.club">INEMA.CLUB</a></p>
+</div>
+</footer>
+<script>
+  (function(){
+    var KEY='otimizevideo-theme';
+    var b=document.body, t=document.getElementById('themeToggle');
+    if(localStorage.getItem(KEY)==='light'){ b.classList.add('light'); t.textContent='☀️'; }
+    t.addEventListener('click',function(){
+      var light=b.classList.toggle('light');
+      t.textContent=light?'☀️':'🌙';
+      localStorage.setItem(KEY, light?'light':'dark');
+    });
+  })();
+</script>
+</body>
+</html>

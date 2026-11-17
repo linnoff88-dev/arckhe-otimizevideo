@@ -1,0 +1,7 @@
+trabalho/
+__pycache__/
+*.pyc
+.venv/
+.superpowers/
+.env
+trabalho/.painel/
