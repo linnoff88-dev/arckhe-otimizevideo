@@ -7,7 +7,7 @@ CLI que toma un video largo (clase, podcast, conferencia — 20 a 30 min) y devu
 
 ## 📖 Guía de uso
 
-Guía completa (landing + paso a paso): **https://inematds.github.io/otimizevideo/guia/es/**
+Guía completa (landing + paso a paso): **https://linnoff88-dev.github.io/arckhe-/guia/es/**
 
 ## 1. Qué hace
 
@@ -117,7 +117,7 @@ con `--config outro.yaml`.
 | | `gemini` (`google/gemini-2.5-flash-lite` vía OpenRouter) | Requiere `OPENROUTER_API_KEY` | |
 | | `ollama` (`qwen3.8:27b`) | Local, gratis, pero requiere el **daemon de Ollama** en ejecución (`http://localhost:11434`) | |
 | | `claude_cli` (Claude Code headless) | Se factura a la suscripción — sin API key, requiere `claude` en el `PATH` | |
-| `tts` | `inemavox` | Local, gratis, pero requiere el **daemon de inemavox** en ejecución (`http://localhost:8010`). La voz y el motor se obtienen de `config.yaml → voz:` / `tts_engine:` — el predeterminado es **`edge` + `pt-BR-FranciscaNeural`** (consulta la sección 15) | **default** |
+| `tts` | `ARCKHÉvox` | Local, gratis, pero requiere el **daemon de ARCKHÉvox** en ejecución (`http://localhost:8010`). La voz y el motor se obtienen de `config.yaml → voz:` / `tts_engine:` — el predeterminado es **`edge` + `pt-BR-FranciscaNeural`** (consulta la sección 15) | **default** |
 | | `elevenlabs` | En la nube, requiere `ELEVENLABS_API_KEY` y `ELEVENLABS_VOICE_ID`; cobra por carácter | |
 
 Los modelos concretos de cada slot de LLM (`glm`, `gemini`, `ollama`, `claude_cli` y el
@@ -154,7 +154,7 @@ python3 otv.py pontuar <id> --modo A --alvo 120 --provedor glm
 python3 otv.py selecionar <id> --modo A --alvo 120
 python3 otv.py substituir <id> --provedor fal     # modo A+: sustituye al presentador por una ilustración
 python3 otv.py render <id> --rapido
-python3 otv.py narrar <id> --provedor inemavox
+python3 otv.py narrar <id> --provedor ARCKHÉvox
 
 # inventario de artefactos + resumen del plan de corte
 python3 otv.py status <id>
@@ -287,9 +287,9 @@ python3 otv.py custo <id>
 
 Casos reales detectados en este proyecto (el changelog completo está en `FALHAS.md`):
 
-- **`inemavox` (TTS): `GET /api/jobs/{id}/download` devuelve 404.** El endpoint correcto es
+- **`ARCKHÉvox` (TTS): `GET /api/jobs/{id}/download` devuelve 404.** El endpoint correcto es
   `GET /api/jobs/{id}/audio` — ya está corregido en el código (`otv/provedores/tts.py`), pero si
-  estás apuntando a otra versión del daemon de inemavox, verifica el endpoint.
+  estás apuntando a otra versión del daemon de ARCKHÉvox, verifica el endpoint.
 - **El titular desaparecía del video sin mostrar ningún error.** Un `%` suelto en el texto del titular (común en
   «100% de certeza» generado por un LLM) hacía que `drawtext` de ffmpeg interpretara `expansion=normal`
   y fallara en silencio (warning oculto por `-v error`, el proceso termina con código 0 y sin
@@ -435,7 +435,7 @@ Lo que la VPS realmente necesita:
 | `GROQ_API_KEY` | sí (predeterminada para transcripción) | o cambiar a `whisper_local`/`whisperx` |
 | `OPENROUTER_API_KEY` | sí (predeterminada para puntuación) | o cambiar a `ollama` |
 | GPU | **no** | `visual: local` (mediapipe) y la detección de escenas funcionan en CPU |
-| daemon de `inemavox` (:8010) | solo modos B/C/N | TTS; sin él, usa `--tts elevenlabs` |
+| daemon de `ARCKHÉvox` (:8010) | solo modos B/C/N | TTS; sin él, usa `--tts elevenlabs` |
 | daemon de Ollama (:11434) | solo si eliges `ollama` | |
 | binario `claude` | **no** | solo si eliges `--pontuacao claude_cli` / `--visual claude_cli` |
 
@@ -445,7 +445,7 @@ Configuración mínima 100% en la nube, sin ningún daemon y sin GPU:
 transcricao: groq
 visual: local        # modo A; para B/C usa glm (también en la nube)
 pontuacao: glm
-tts: elevenlabs      # evita depender de inemavox local
+tts: elevenlabs      # evita depender de ARCKHÉvox local
 ```
 
 Dos advertencias para VPS pequeñas:

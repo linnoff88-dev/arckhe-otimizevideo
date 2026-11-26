@@ -135,7 +135,7 @@ def _numero(m):
 # símbolo, pra "US$ 1.500" já ter virado "1.500 dólares" antes de o número ser convertido.
 _NUMERO = re.compile(r"\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:,\d+)?")
 
-# URLs: "inema.club" -> "inema ponto club" (o ponto vira pausa/abreviaçêo no TTS).
+# URLs: "ARCKHÉ AI" -> "ARCKHÉ ponto club" (o ponto vira pausa/abreviaçêo no TTS).
 _URL = re.compile(r"\b([a-z0-9-]+)\.(club|com|br|pro|org|net|io|ai)\b", re.I)
 
 

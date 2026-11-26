@@ -20,7 +20,7 @@ de tempos (EDL). Cada fase tem provedor trocável por configuraçêo.
 | Ordem de entrega dos modos | A (condensado) → B (sem apresentador) → C (só gráficos/demos) |
 | Duraçêo alvo | 120 s, tolerância ±25 % (parâmetro `--alvo`) |
 | Formato de saída | 16:9 igual ao original; 9:16 fica pra depois |
-| Narraçêo (modo B) | inemavox / chatterbox, voz `rachel` (default global) |
+| Narraçêo (modo B) | ARCKHÉvox / chatterbox, voz `rachel` (default global) |
 | Forma de entrega | CLI Python em fases (`otv`) nesta pasta; skill fina por cima depois |
 | Saída | `~/projetos/output/otimizevideo/<id>/` |
 | Lote | um vídeo por vez (lista/playlist depois) |
@@ -102,7 +102,7 @@ fonte ─▶ 1 ingest ─▶ video.mp4 · audio.opus · metadata.json
 transcricao: groq          # groq | whisper_local | whisperx
 visual:      local         # local (rosto+cena, R$0) | claude_cli | glm | gemini | gemini_video
 pontuacao:   claude_cli    # claude_cli (Claude Code headless, assinatura) | glm | gemini | ollama
-tts:         inemavox      # inemavox | elevenlabs | fish
+tts:         ARCKHÉvox      # ARCKHÉvox | elevenlabs | fish
 modelos:
   claude_cli: sonnet       # `claude -p --model sonnet`; opus se quiser mais qualidade
   glm:    z-ai/glm-5.3-flash
@@ -188,7 +188,7 @@ Saída: `plan.json`. **Mudar alvo, modo ou regras re-roda só esta fase — R$0,
 1. Seleçêo com filtro B produz segmentos só visuais, somando `T` segundos.
 2. LLM recebe **só o texto** das unidades escolhidas + o texto vizinho (contexto) e escreve uma
    narraçêo em PT-BR de ~`T × 2,5` palavras (≈150 ppm) dividida por segmento. Uma chamada.
-3. TTS gera `narracao_<n>.wav` por segmento (inemavox).
+3. TTS gera `narracao_<n>.wav` por segmento (ARCKHÉvox).
 4. Ajuste de duraçêo por segmento, no render, sem chamar modelo:
    - narraçêo mais curta que o vídeo → mantém vídeo, silêncio no fim;
    - narraçêo mais longa → `estender_s` = diferença; render aplica `tpad` (freeze do último frame)
@@ -222,7 +222,7 @@ Modo A funciona só com 3. Modos B e C precisam de 3b ou 3c.
   `-c:v libx264 -crf 20 -preset medium`, `-c:a aac`). `--rapido` usa concat demuxer com
   `inpoint/outpoint` e `-c copy` (corta em keyframe, sem re-encode). Fade de áudio de 40 ms nas
   fronteiras (`afade`) pra evitar clique. Loudness final `loudnorm`.
-- **7 narrar:** `inemavox` (HTTP local, chatterbox, `rachel`) | `elevenlabs` | `fish`. Contrato:
+- **7 narrar:** `ARCKHÉvox` (HTTP local, chatterbox, `rachel`) | `elevenlabs` | `fish`. Contrato:
   texto → wav 48 kHz.
 
 ## 6. CLI
@@ -243,7 +243,7 @@ tokens/segundos reportados por cada provedor num `custos.json`.
 otimizevideo/
   otv.py  config.yaml  requirements.txt  README.md
   otv/  fases/{ingest,transcrever,unidades,cenas,pontuar,selecionar,render,narrar}.py
-        provedores/{base,groq_whisper,whisper_local,whisperx,openrouter,gemini_video,inemavox,elevenlabs}.py
+        provedores/{base,groq_whisper,whisper_local,whisperx,openrouter,gemini_video,ARCKHÉvox,elevenlabs}.py
         contratos.py  (dataclasses + validaçêo dos JSONs)   util/{ffmpeg,keys,custos}.py
   prompts/{pontuar.md,classificar.md,narrar.md}
   tests/  (fixtures pequenas: transcript sintético, notas sintéticas → plan esperado)
@@ -350,7 +350,7 @@ Spike descartável rodou ingest → Groq → unidades → pontuaçêo → seleç
 | Cenas + rosto (local) | R$0 |
 | Classificaçêo VLM (3b) | ~US$0,004 |
 | Pontuaçêo (1 chamada) | ~US$0,002 |
-| Seleçêo / render / TTS inemavox | R$0 |
+| Seleçêo / render / TTS ARCKHÉvox | R$0 |
 | **Total** | **≈ US$0,03** (re-cortes: R$0) |
 
 ## 11c. Validaçêo ponta a ponta (Task 12, 2026-08-27, mesmo vídeo `dQYKcjvXhIY`)
@@ -374,7 +374,7 @@ foram executados; o que segue é o resultado real, nêo o esperado.
 
 `US$0,0152` no OpenRouter + 4 imagens no fal + Groq ≈ US$0,02. As fases mais caras foram
 **classificar** (378 cenas em 19 lotes de miniaturas, US$0,0099, 195 s) e **pontuar**
-(US$0,0048). O `narrar` custou US$0,0004 de LLM e 412 s — quase tudo TTS local (inemavox).
+(US$0,0048). O `narrar` custou US$0,0004 de LLM e 412 s — quase tudo TTS local (ARCKHÉvox).
 
 ### Três falhas reais encontradas (todas corrigidas, ver `FALHAS.md`)
 

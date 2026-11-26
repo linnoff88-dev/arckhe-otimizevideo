@@ -18,7 +18,7 @@ from otv.util.custos import registrar
 # rosto sempre que a fala citava alguém (Bezos, Altman, "o cientista"), e a substituiçêo só
 # trocava um rosto por outro. O que funciona é dizer o que DEVE aparecer, entêo o prompt vira
 # uma diretiva de natureza-morta conceitual, com o assunto entrando como TEMA e nêo como cena.
-PREFIXO_PROMPT = ("Conceptual editorial illustration, dark cinematic still life. "
+PREFIXO_PROMPT = ("Conceptual editorial illustration, dark cARCKHÉtic still life. "
                   "Depict only objects, environments and abstract forms — laboratory glassware, "
                   "molecular structures, machinery, instruments, landscapes, geometry. "
                   "Empty of any person. Theme: ")

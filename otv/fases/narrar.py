@@ -176,7 +176,7 @@ def narrar(dir, cfg, provedor=None):
               f"(-{total:.1f}s): " + ", ".join(f"#{k} -{v}s" for k, v in encolhidos))
     ajustar_extensao(segs, durs, max_freeze)
     plan["total_s"] = round(sum((s["out"] - s["in"]) + float(s.get("estender_s") or 0) for s in segs), 2)
-    plan["narracao"] = {"arquivos": arquivos, "provedor": provedor or cfg.get("tts", "inemavox"), "llm": llm.nome}
+    plan["narracao"] = {"arquivos": arquivos, "provedor": provedor or cfg.get("tts", "ARCKHÉvox"), "llm": llm.nome}
     (dir / "plan.json").write_text(json.dumps(plan, ensure_ascii=False, indent=1))
     (dir / "roteiro.md").write_text("\n\n".join(f"## Segmento {k} ({s['in']:.1f}–{s['out']:.1f}s)\n\n{t}" for k, (s, t) in enumerate(zip(segs, textos))))
     registrar(dir, "narrar", {"llm": llm.nome, "uso": uso, "tts": plan["narracao"]["provedor"], "segundos": round(time.time() - t0, 1)})

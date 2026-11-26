@@ -6,7 +6,7 @@
 
 **Architecture:** Pipeline em fases, cada uma lê/escreve JSON numa pasta `trabalho/<id>/`; nenhuma fase conhece o provedor da outra. O núcleo (unidades + seleçêo + snap) é código puro e testado sem rede. Modelos entram em dois pontos apenas: pontuaçêo (texto) e classificaçêo visual (miniaturas), sempre por id, nunca por timestamp.
 
-**Tech Stack:** Python 3.12, `requests`, `pyyaml`, `pytest`, `ffmpeg/ffprobe`, `yt-dlp`, `scenedetect[opencv]`, `mediapipe`; provedores: Groq (Whisper), OpenRouter (`z-ai/glm-5.3-flash`, `google/gemini-2.5-flash-lite`), Ollama local, inemavox (TTS chatterbox).
+**Tech Stack:** Python 3.12, `requests`, `pyyaml`, `pytest`, `ffmpeg/ffprobe`, `yt-dlp`, `scenedetect[opencv]`, `mediapipe`; provedores: Groq (Whisper), OpenRouter (`z-ai/glm-5.3-flash`, `google/gemini-2.5-flash-lite`), Ollama local, ARCKHÉvox (TTS chatterbox).
 
 **Spec:** `docs/superpowers/specs/2026-08-27-otimizevideo-design.md`
 
@@ -19,7 +19,7 @@
 - Timestamps de palavras sêo normalizados para monotônicos antes de qualquer uso (spec §11.4).
 - `min_segmento_s` aplica-se **depois** do snap (spec §11.4).
 - Saída final copiada para `~/projetos/output/otimizevideo/<id>/`; intermediários ficam em `trabalho/<id>/` (gitignored).
-- Commits neste repo com autor `inematds <inematds@gmail.com>` (já configurado localmente). Commit ao fim de cada task.
+- Commits neste repo com autor `linnoff88-dev <linnoff88-dev@gmail.com>` (já configurado localmente). Commit ao fim de cada task.
 - Testes unitários nêo acessam rede nem GPU; provedores externos só em testes marcados `@pytest.mark.integracao`.
 
 ---
@@ -49,7 +49,7 @@ otimizevideo/
     fases/narrar.py            # Task 10
     provedores/transcricao.py  # groq, whisper_local, whisperx — Task 3
     provedores/llm.py          # OpenRouter e Ollama, chat_json() — Task 6
-    provedores/tts.py          # inemavox, elevenlabs — Task 10
+    provedores/tts.py          # ARCKHÉvox, elevenlabs — Task 10
   prompts/pontuar.md  prompts/classificar.md  prompts/narrar.md
   tests/  (fixtures em tests/fixtures/)
 ```
@@ -89,7 +89,7 @@ addopts = -m "not integracao"
 transcricao: groq          # groq | whisper_local | whisperx
 visual: local              # local | glm | gemini
 pontuacao: glm             # glm | gemini | ollama
-tts: inemavox              # inemavox | elevenlabs
+tts: ARCKHÉvox              # ARCKHÉvox | elevenlabs
 modelos:
   glm: z-ai/glm-5.3-flash
   gemini: google/gemini-2.5-flash-lite
@@ -159,7 +159,7 @@ from pathlib import Path
 import copy, yaml
 
 DEFAULTS = {
-    "transcricao": "groq", "visual": "local", "pontuacao": "glm", "tts": "inemavox",
+    "transcricao": "groq", "visual": "local", "pontuacao": "glm", "tts": "ARCKHÉvox",
     "modelos": {"glm": "z-ai/glm-5.3-flash", "gemini": "google/gemini-2.5-flash-lite",
                 "ollama": "qwen3.8:27b", "whisper_local": "turbo"},
     "openrouter": {"reasoning_effort": "low", "max_tokens": 20000},
@@ -1410,7 +1410,7 @@ git add otv tests && git commit -m "feat: render ffmpeg (trim/concat, rapido, ex
 
 ---
 
-### Task 10: Narraçêo (modo B): roteiro por LLM, TTS inemavox/ElevenLabs, ajuste de duraçêo
+### Task 10: Narraçêo (modo B): roteiro por LLM, TTS ARCKHÉvox/ElevenLabs, ajuste de duraçêo
 
 **Files:**
 - Create: `prompts/narrar.md`, `otv/provedores/tts.py`, `otv/fases/narrar.py`
@@ -1418,7 +1418,7 @@ git add otv tests && git commit -m "feat: render ffmpeg (trim/concat, rapido, ex
 
 **Interfaces:**
 - Produces: `roteiro_por_segmento(segmentos, contexto, llm) -> list[str]`; `tts(texto, out_wav, cfg, provedor=None) -> Path`; `duracao_wav(p) -> float`; `narrar(dir, cfg, provedor=None) -> Path` (escreve `narracao/seg_NN.wav`, `roteiro.md`, e atualiza `plan.json` com `narracao: {"arquivos": [...], "provedor": ...}` e `estender_s` por segmento).
-- inemavox: `POST http://localhost:8010/api/jobs/tts` body `{"text","engine":"chatterbox","voice":"rachel","lang":"pt"}` → `{"id": ...}`; poll `GET /api/jobs/{id}` até `status` final; áudio em `GET /api/jobs/{id}/download`. **Confirmar no primeiro uso os nomes exatos dos campos `id`/`status`** com `curl localhost:8010/api/jobs | head` e ajustar as constantes `CAMPO_ID`, `STATUS_OK`, `STATUS_ERRO` no topo de `tts.py`.
+- ARCKHÉvox: `POST http://localhost:8010/api/jobs/tts` body `{"text","engine":"chatterbox","voice":"rachel","lang":"pt"}` → `{"id": ...}`; poll `GET /api/jobs/{id}` até `status` final; áudio em `GET /api/jobs/{id}/download`. **Confirmar no primeiro uso os nomes exatos dos campos `id`/`status`** com `curl localhost:8010/api/jobs | head` e ajustar as constantes `CAMPO_ID`, `STATUS_OK`, `STATUS_ERRO` no topo de `tts.py`.
 
 - [ ] **Step 1: `prompts/narrar.md`**
 
@@ -1459,7 +1459,7 @@ def test_narrar_gera_wavs_e_atualiza_plan(tmp_path, monkeypatch):
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", "sine=frequency=300", "-t", "3", str(out)], check=True); return out
     monkeypatch.setattr(Nn, "criar_llm", lambda cfg, slot: FakeLLM())
     monkeypatch.setattr(Nn, "tts", fake_tts)
-    narrar(tmp_path, {"pontuacao": "glm", "tts": "inemavox"})
+    narrar(tmp_path, {"pontuacao": "glm", "tts": "ARCKHÉvox"})
     plan = json.loads((tmp_path / "plan.json").read_text())
     assert plan["narracao"]["arquivos"] == ["narracao/seg_00.wav", "narracao/seg_01.wav"]
     assert (tmp_path / "roteiro.md").exists() and all(s["estender_s"] == 0 for s in plan["segmentos"])
@@ -1477,22 +1477,22 @@ from pathlib import Path
 from otv.util.keys import key
 from otv.util.ffmpeg import run
 
-INEMAVOX = "http://localhost:8010"; CAMPO_ID = "id"; STATUS_OK = {"completed", "done", "finished"}; STATUS_ERRO = {"failed", "error"}
+ARCKHÉVOX = "http://localhost:8010"; CAMPO_ID = "id"; STATUS_OK = {"completed", "done", "finished"}; STATUS_ERRO = {"failed", "error"}
 
-def tts_inemavox(texto, out, voz="rachel", engine="chatterbox"):
-    r = requests.post(f"{INEMAVOX}/api/jobs/tts", json={"text": texto, "engine": engine, "voice": voz, "lang": "pt"}, timeout=60)
+def tts_ARCKHÉvox(texto, out, voz="rachel", engine="chatterbox"):
+    r = requests.post(f"{ARCKHÉVOX}/api/jobs/tts", json={"text": texto, "engine": engine, "voice": voz, "lang": "pt"}, timeout=60)
     r.raise_for_status(); jid = r.json()[CAMPO_ID]
     for _ in range(600):
-        j = requests.get(f"{INEMAVOX}/api/jobs/{jid}", timeout=30).json()
+        j = requests.get(f"{ARCKHÉVOX}/api/jobs/{jid}", timeout=30).json()
         st = str(j.get("status", "")).lower()
         if st in STATUS_OK:
             break
         if st in STATUS_ERRO:
-            raise RuntimeError(f"inemavox falhou: {j.get('error') or j}")
+            raise RuntimeError(f"ARCKHÉvox falhou: {j.get('error') or j}")
         time.sleep(2)
     else:
-        raise RuntimeError("inemavox: timeout")
-    a = requests.get(f"{INEMAVOX}/api/jobs/{jid}/download", timeout=120); a.raise_for_status()
+        raise RuntimeError("ARCKHÉvox: timeout")
+    a = requests.get(f"{ARCKHÉVOX}/api/jobs/{jid}/download", timeout=120); a.raise_for_status()
     bruto = Path(out).with_suffix(".bin"); bruto.write_bytes(a.content)
     run(["ffmpeg", "-v", "error", "-y", "-i", str(bruto), "-ar", "48000", "-ac", "1", str(out)]); bruto.unlink()
     return Path(out)
@@ -1507,8 +1507,8 @@ def tts_elevenlabs(texto, out, voz=None):
     return Path(out)
 
 def tts(texto, out, cfg, provedor=None):
-    p = provedor or cfg.get("tts", "inemavox")
-    return tts_elevenlabs(texto, out) if p == "elevenlabs" else tts_inemavox(texto, out)
+    p = provedor or cfg.get("tts", "ARCKHÉvox")
+    return tts_elevenlabs(texto, out) if p == "elevenlabs" else tts_ARCKHÉvox(texto, out)
 ```
 
 - [ ] **Step 5: Implementar `otv/fases/narrar.py`**
@@ -1559,7 +1559,7 @@ def narrar(dir, cfg, provedor=None):
             run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", "anullsrc=r=48000:cl=mono", "-t", f"{s['out'] - s['in']:.3f}", str(wav)])
         arquivos.append(f"narracao/seg_{k:02d}.wav"); durs.append(duracao_wav(wav))
     ajustar_extensao(segs, durs)
-    plan["narracao"] = {"arquivos": arquivos, "provedor": provedor or cfg.get("tts", "inemavox"), "llm": llm.nome}
+    plan["narracao"] = {"arquivos": arquivos, "provedor": provedor or cfg.get("tts", "ARCKHÉvox"), "llm": llm.nome}
     (dir / "plan.json").write_text(json.dumps(plan, ensure_ascii=False, indent=1))
     (dir / "roteiro.md").write_text("\n\n".join(f"## Segmento {k} ({s['in']:.1f}–{s['out']:.1f}s)\n\n{t}" for k, (s, t) in enumerate(zip(segs, textos))))
     registrar(dir, "narrar", {"llm": llm.nome, "uso": uso, "tts": plan["narracao"]["provedor"], "segundos": round(time.time() - t0, 1)})
@@ -1570,14 +1570,14 @@ def narrar(dir, cfg, provedor=None):
 
 Run: `pytest tests/test_narrar.py -v`
 
-- [ ] **Step 7: Integraçêo manual do inemavox (daemon em :8010 precisa estar rodando)**
+- [ ] **Step 7: Integraçêo manual do ARCKHÉvox (daemon em :8010 precisa estar rodando)**
 
-Run: `python -c "from otv.provedores.tts import tts_inemavox; print(tts_inemavox('Teste de narraçêo.', '/tmp/t.wav'))"` — se o campo do job nêo for `id`/`status`, ajustar `CAMPO_ID`/`STATUS_OK` conforme a resposta real de `GET /api/jobs`.
+Run: `python -c "from otv.provedores.tts import tts_ARCKHÉvox; print(tts_ARCKHÉvox('Teste de narraçêo.', '/tmp/t.wav'))"` — se o campo do job nêo for `id`/`status`, ajustar `CAMPO_ID`/`STATUS_OK` conforme a resposta real de `GET /api/jobs`.
 
 - [ ] **Step 8: Commit**
 
 ```bash
-git add otv prompts tests && git commit -m "feat: narraçêo modo B (roteiro LLM, TTS inemavox/elevenlabs, extensêo)"
+git add otv prompts tests && git commit -m "feat: narraçêo modo B (roteiro LLM, TTS ARCKHÉvox/elevenlabs, extensêo)"
 ```
 
 ---
@@ -1853,5 +1853,5 @@ trocados e o áudio continua o original; (c) confirmar que o último segmento co
 ## Self-review
 
 - **Cobertura da spec:** §3 contratos → T1; §3.2 config → T1; §4.1 unidades → T4; §4.2 pontuaçêo → T6+T7; §4.3 seleçêo (todas as 8 regras) + §11.5–11.7 (completar, coesêo, gancho) → T8; §4.4 modo B → T10 + T9 (mix/extensêo); §4.5 visual local/3b → T5 (3c "vídeo inteiro via Gemini Files API" fica **fora deste plano**, é slot futuro — anotado como YAGNI até aparecer vídeo onde a fala nêo basta); §5 ingest/transcriçêo/render → T2/T3/T9; §6 CLI → T11; §8 erros → distribuídos (retry em T3/T6, transcriçêo vazia em T3, seleçêo abaixo de 50 % e modo B sem cenas em T8, arquivo > limite: Groq aceita opus 32k de 30 min ≈ 7 MB, entêo o fatiamento nêo foi implementado — se um vídeo > 100 min aparecer, adicionar); §9 testes → todas as tasks; §11.1 reasoning low → T6; §11.4 normalizaçêo + mínimo pós-snap → T3/T8.
-- **Placeholders:** nenhum "TBD"; o único ponto a confirmar em runtime (campos `id`/`status` do inemavox) tem instruçêo concreta de como confirmar e onde ajustar.
+- **Placeholders:** nenhum "TBD"; o único ponto a confirmar em runtime (campos `id`/`status` do ARCKHÉvox) tem instruçêo concreta de como confirmar e onde ajustar.
 - **Consistência de nomes:** `chat_json` (T6) usado em T5/T7/T10; `criar_llm(cfg, slot)` idem; `validar_notas` (T1) em T7; `registrar` (T2) em todas; `probe/thumb/run` (T2) em T5/T9/T10; contrato de `plan["narracao"]["arquivos"]` definido em T10 e consumido em T9; `estender_s` escrito em T8 (0) e T10, lido em T9.

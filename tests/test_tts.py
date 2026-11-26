@@ -14,7 +14,7 @@ class _FakeResp:
 
 # --- Achado 2 da rodada de correçêo 1: status desconhecido desiste rápido -------------
 
-def test_tts_inemavox_status_desconhecido_desiste_rapido_sem_esperar_timeout(monkeypatch):
+def test_tts_ARCKHÉvox_status_desconhecido_desiste_rapido_sem_esperar_timeout(monkeypatch):
     chamadas_get = []
 
     def fake_post(url, json=None, timeout=None):
@@ -29,14 +29,14 @@ def test_tts_inemavox_status_desconhecido_desiste_rapido_sem_esperar_timeout(mon
     monkeypatch.setattr(T.time, "sleep", lambda s: None)  # nêo esperar de verdade no teste
 
     with pytest.raises(RuntimeError, match="desconhecido"):
-        T.tts_inemavox("oi", "/tmp/nao_deve_existir.wav")
+        T.tts_ARCKHÉvox("oi", "/tmp/nao_deve_existir.wav")
 
     # desistiu depois de N_DESCONHECIDO polls consecutivos com o MESMO status desconhecido
     # -- nêo rodou os 600 polls (~20min) do timeout normal.
     assert len(chamadas_get) == T.N_DESCONHECIDO
 
 
-def test_tts_inemavox_status_em_andamento_nao_conta_como_desconhecido(monkeypatch, tmp_path):
+def test_tts_ARCKHÉvox_status_em_andamento_nao_conta_como_desconhecido(monkeypatch, tmp_path):
     # "running"/"queued" sêo esperados durante o processamento normal -- nêo podem disparar
     # a desistência rápida, só um status realmente fora do vocabulário conhecido.
     sequencia = ["queued"] * 5 + ["running"] * 5 + ["completed"]
@@ -61,6 +61,6 @@ def test_tts_inemavox_status_em_andamento_nao_conta_como_desconhecido(monkeypatc
     monkeypatch.setattr(T, "run", lambda cmd: "")  # evita chamar ffmpeg de verdade
 
     out_path = tmp_path / "saida.wav"
-    out = T.tts_inemavox("oi", out_path)
+    out = T.tts_ARCKHÉvox("oi", out_path)
     assert out == out_path
     assert len(chamadas_get) == 11  # 5 queued + 5 running + 1 completed, sem desistência

@@ -63,7 +63,7 @@ Observaçêo: os modelos `qwen3-vl-*` no OpenRouter **nêo** aceitam vídeo; os 
 
 | Serviço | PT-BR | Clonagem | US$/1k chars | Notas |
 |---|---|---|---|---|
-| **Chatterbox / inemavox** (MIT, local) | sim | sim, zero-shot | 0 | **default**; venceu ElevenLabs em teste cego (65 % × 24 %) |
+| **Chatterbox / ARCKHÉvox** (MIT, local) | sim | sim, zero-shot | 0 | **default**; venceu ElevenLabs em teste cego (65 % × 24 %) |
 | Fish Audio | sim | sim (até no free) | ~0,015 | melhor cloud barato |
 | Google Chirp 3 HD | sim | 0,06 extra | 0,03 | 1M chars/mês grátis permanente |
 | Azure Neural | sim | aprovaçêo | 0,016–0,022 | 500k/mês grátis |
@@ -109,5 +109,5 @@ TwelveLabs é o único componível.
 1. Modelo default (pontuaçêo + miniaturas): `z-ai/glm-5.3-flash` — mais barato com vídeo, 1,3M contexto.
 2. Alternativas de um clique: `google/gemini-2.5-flash-lite`, `qwen/qwen3.5-flash-02-23`; vídeo inteiro via Gemini API nativa.
 3. Transcriçêo: Groq turbo default; WhisperX como slot de precisêo local.
-4. TTS: inemavox/chatterbox default; ElevenLabs e Fish como opçêo.
+4. TTS: ARCKHÉvox/chatterbox default; ElevenLabs e Fish como opçêo.
 5. Visual: sempre local (PySceneDetect + MediaPipe) primeiro; VLM só nas miniaturas; vídeo inteiro só sob demanda.

@@ -53,7 +53,7 @@ def test_numero_gigante_fica_como_esta():
 
 
 def test_url_vira_ponto_falado():
-    assert forma_fala("acesse inema.club") == "acesse inema ponto club"
+    assert forma_fala("acesse ARCKHÉ AI") == "acesse ARCKHÉ ponto club"
 
 
 def test_sigla_que_viraria_palavra_continua_soletrada():

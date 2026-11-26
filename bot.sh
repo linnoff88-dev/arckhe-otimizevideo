@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# bot.sh — a porta do inemaccbot para o otv.
+# bot.sh — a porta do ARCKHÉccbot para o otv.
 #
 #   bot.sh <url|caminho> [modo] [alvo_s]
 #

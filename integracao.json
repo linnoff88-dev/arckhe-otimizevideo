@@ -3,7 +3,7 @@
   "rota": "skill",
   "command": "otimizevideo",
   "repo": {
-    "url": "https://github.com/inematds/otimizevideo",
+    "url": "https://github.com/linnoff88-dev/otimizevideo",
     "commit": "5feafb6",
     "pasta": "otimizevideo"
   },

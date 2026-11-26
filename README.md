@@ -7,7 +7,7 @@ CLI que pega um vêÂ­deo longo (aula, podcast, palestra ê¢â¬â 20 
 
 ## ê°Å¸ââ Guia de uso
 
-Guia completo (landing + passo a passo): **https://inematds.github.io/otimizevideo/guia/**
+Guia completo (landing + passo a passo): **https://linnoff88-dev.github.io/arckhe-/guia/**
 
 ## 1. O que faz
 
@@ -117,7 +117,7 @@ pode ser trocado com `--config outro.yaml`.
 | | `gemini` (`google/gemini-2.5-flash-lite` via OpenRouter) | Precisa de `OPENROUTER_API_KEY` | |
 | | `ollama` (`qwen3.8:27b`) | Local, grêÂ¡tis, mas precisa de **daemon Ollama** rodando (`http://localhost:11434`) | |
 | | `claude_cli` (Claude Code headless) | Sai da assinatura ê¢â¬â sem API key, precisa do `claude` no `PATH` | |
-| `tts` | `inemavox` | Local, grêÂ¡tis, mas precisa do **daemon inemavox** rodando (`http://localhost:8010`). Voz e motor saem de `config.yaml ê¢â â voz:` / `tts_engine:` ê¢â¬â o default êÂ© **`edge` + `pt-BR-FranciscaNeural`** (ver seêÂ§êÂ£o 15) | **default** |
+| `tts` | `ARCKHÉvox` | Local, grêÂ¡tis, mas precisa do **daemon ARCKHÉvox** rodando (`http://localhost:8010`). Voz e motor saem de `config.yaml ê¢â â voz:` / `tts_engine:` ê¢â¬â o default êÂ© **`edge` + `pt-BR-FranciscaNeural`** (ver seêÂ§êÂ£o 15) | **default** |
 | | `elevenlabs` | Cloud, precisa de `ELEVENLABS_API_KEY` e `ELEVENLABS_VOICE_ID`; cobra por caractere | |
 
 Os modelos concretos de cada slot de LLM (`glm`, `gemini`, `ollama`, `claude_cli`, e o
@@ -154,7 +154,7 @@ python3 otv.py pontuar <id> --modo A --alvo 120 --provedor glm
 python3 otv.py selecionar <id> --modo A --alvo 120
 python3 otv.py substituir <id> --provedor fal     # modo A+: troca o apresentador por ilustraêÂ§êÂ£o
 python3 otv.py render <id> --rapido
-python3 otv.py narrar <id> --provedor inemavox
+python3 otv.py narrar <id> --provedor ARCKHÉvox
 
 # inventêÂ¡rio de artefatos + resumo do plano de corte
 python3 otv.py status <id>
@@ -288,9 +288,9 @@ python3 otv.py custo <id>
 
 Casos reais jêÂ¡ encontrados neste projeto (changelog completo em `FALHAS.md`):
 
-- **`inemavox` (TTS): `GET /api/jobs/{id}/download` devolve 404.** O endpoint certo êÂ©
+- **`ARCKHÉvox` (TTS): `GET /api/jobs/{id}/download` devolve 404.** O endpoint certo êÂ©
   `GET /api/jobs/{id}/audio` ê¢â¬â jêÂ¡ corrigido no cêÂ³digo (`otv/provedores/tts.py`), mas se vocêÂª
-  estiver apontando pra outra versêÂ£o do daemon inemavox, confira o endpoint.
+  estiver apontando pra outra versêÂ£o do daemon ARCKHÉvox, confira o endpoint.
 - **Manchete sumindo do vêÂ­deo sem erro nenhum.** Um `%` solto no texto da manchete (comum em
   "100% de certeza" vindo de LLM) fazia o `drawtext` do ffmpeg interpretar `expansion=normal`
   e falhar silenciosamente (warning engolido por `-v error`, processo sai com cêÂ³digo 0 e sem
@@ -437,7 +437,7 @@ O que a VPS precisa de verdade:
 | `GROQ_API_KEY` | sim (default de transcriêÂ§êÂ£o) | ou trocar por `whisper_local`/`whisperx` |
 | `OPENROUTER_API_KEY` | sim (default de pontuaêÂ§êÂ£o) | ou trocar por `ollama` |
 | GPU | **nêÂ£o** | `visual: local` (mediapipe) e a detecêÂ§êÂ£o de cena rodam em CPU |
-| daemon `inemavox` (:8010) | sêÂ³ modos B/C/N | TTS ê¢â¬â sem ele, use `--tts elevenlabs` |
+| daemon `ARCKHÉvox` (:8010) | sêÂ³ modos B/C/N | TTS ê¢â¬â sem ele, use `--tts elevenlabs` |
 | daemon Ollama (:11434) | sêÂ³ se escolher `ollama` | |
 | binêÂ¡rio `claude` | **nêÂ£o** | sêÂ³ se escolher `--pontuacao claude_cli` / `--visual claude_cli` |
 
@@ -447,7 +447,7 @@ Config mêÂ­nima 100% cloud, sem daemon nenhum e sem GPU:
 transcricao: groq
 visual: local        # modo A; para B/C use glm (tambêÂ©m cloud)
 pontuacao: glm
-tts: elevenlabs      # evita depender do inemavox local
+tts: elevenlabs      # evita depender do ARCKHÉvox local
 ```
 
 Duas ressalvas de VPS pequena:

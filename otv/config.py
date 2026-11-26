@@ -2,7 +2,7 @@ from pathlib import Path
 import copy, yaml
 
 DEFAULTS = {
-    "transcricao": "groq", "visual": "local", "pontuacao": "glm", "tts": "inemavox",
+    "transcricao": "groq", "visual": "local", "pontuacao": "glm", "tts": "ARCKHÉvox",
     "imagem": "fal",
     "voz": "pt-BR-FranciscaNeural", "tts_engine": "edge",
     "cta": "assets/cta.mp4", "fade_final_s": 0.8,

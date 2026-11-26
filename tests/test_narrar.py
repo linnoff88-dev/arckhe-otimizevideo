@@ -19,7 +19,7 @@ def test_narrar_gera_wavs_e_atualiza_plan(tmp_path, monkeypatch):
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", "sine=frequency=300", "-t", "3", str(out)], check=True); return out
     monkeypatch.setattr(Nn, "criar_llm", lambda cfg, slot: FakeLLM())
     monkeypatch.setattr(Nn, "tts", fake_tts)
-    narrar(tmp_path, {"pontuacao": "glm", "tts": "inemavox"})
+    narrar(tmp_path, {"pontuacao": "glm", "tts": "ARCKHÉvox"})
     plan = json.loads((tmp_path / "plan.json").read_text())
     assert plan["narracao"]["arquivos"] == ["narracao/seg_00.wav", "narracao/seg_01.wav"]
     assert (tmp_path / "roteiro.md").exists() and all(s["estender_s"] == 0 for s in plan["segmentos"])
@@ -42,7 +42,7 @@ def test_narrar_segmento_sem_texto_gera_wav_silencioso(tmp_path, monkeypatch):
         subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", "sine=frequency=300", "-t", "3", str(out)], check=True); return out
     monkeypatch.setattr(Nn, "criar_llm", lambda cfg, slot: FakeLLM())
     monkeypatch.setattr(Nn, "tts", fake_tts)
-    narrar(tmp_path, {"pontuacao": "glm", "tts": "inemavox"})
+    narrar(tmp_path, {"pontuacao": "glm", "tts": "ARCKHÉvox"})
     plan = json.loads((tmp_path / "plan.json").read_text())
     arquivos = plan["narracao"]["arquivos"]
     assert len(arquivos) == 2 and all(a is not None for a in arquivos)
