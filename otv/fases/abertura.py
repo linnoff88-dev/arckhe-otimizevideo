@@ -3,13 +3,13 @@
 Estrutura: um card de CAPA editorial (manchete garrafal cobrindo parte do quadro) seguido de
 blocos com trechos do próprio vídeo e um texto garrafal por cima, tudo narrado.
 
-Por que a abertura é uma composição HTML (HyperFrames) e não `drawtext`: o `drawtext` do ffmpeg
+Por que a abertura é uma composiçêo HTML (HyperFrames) e nêo `drawtext`: o `drawtext` do ffmpeg
 dá conta de uma linha sóbria — foi o que fez a manchete antiga, e ficou fraca. Capa editorial
 tem várias linhas, hierarquia, caixa alta condensada e bloco de cor cobrindo parte do quadro;
 em `drawtext` cada quebra de linha é um filtro separado, sem controle de entrelinha e sem jeito
-de conferir antes de renderizar. O mesmo motor serve pro CTA, então é um componente só.
+de conferir antes de renderizar. O mesmo motor serve pro CTA, entêo é um componente só.
 
-Os trechos vêm de cenas que NÃO entraram no corte final: a chamada mostra que existe material,
+Os trechos vêm de cenas que NêO entraram no corte final: a chamada mostra que existe material,
 sem queimar o que a pessoa vai ver em seguida.
 """
 import json, re, shutil, subprocess, time
@@ -22,11 +22,11 @@ from otv.util.fala import forma_fala
 from otv.util.ffmpeg import probe, run, thumb
 
 DUR_CLIPE = 2.6         # segundos de vídeo por bloco (o texto garrafal precisa de tempo de leitura)
-MIN_BLOCO = 2.4         # piso de duração de um bloco, mesmo com fala curta
-# O aperto da duração vive no PROMPT (fala curta), nunca num teto que corta o bloco por baixo
-# do áudio. Em 2026-08-27 um teto de 4.8s sobre um wav de 6.6s fez a narração do bloco 0
+MIN_BLOCO = 2.4         # piso de duraçêo de um bloco, mesmo com fala curta
+# O aperto da duraçêo vive no PROMPT (fala curta), nunca num teto que corta o bloco por baixo
+# do áudio. Em 2026-08-27 um teto de 4.8s sobre um wav de 6.6s fez a narraçêo do bloco 0
 # continuar tocando enquanto a do bloco 1 já tinha começado: 1,8s de duas vozes sobrepostas.
-# MAX_BLOCO agora é só um alvo pra avisar quando a chamada estourou, não um corte.
+# MAX_BLOCO agora é só um alvo pra avisar quando a chamada estourou, nêo um corte.
 ALVO_BLOCO = 4.8
 MAX_PALAVRAS_FALA = 12
 FOLGA_BLOCO = 0.45      # respiro depois da fala, antes de trocar de bloco
@@ -38,24 +38,24 @@ def _usadas(plan):
     return [(s["in"], s["out"]) for s in plan["segmentos"]]
 
 
-MAX_ROSTO = 0.04        # fração de área do maior rosto tolerada na abertura
+MAX_ROSTO = 0.04        # fraçêo de área do maior rosto tolerada na abertura
 
 
 def sem_apresentador(c):
     """Cena serve pra abertura? Rosto grande, talking_head e PiP ficam de fora.
 
-    Não basta olhar `visual`: a classificação é por cena, e num vídeo estilo "apresentador
+    Nêo basta olhar `visual`: a classificaçêo é por cena, e num vídeo estilo "apresentador
     com gráfico" a cena sai rotulada `grafico` com o apresentador em quadro do mesmo jeito.
     O `rosto_pct` (medido localmente, cena a cena) é o filtro que pega esse caso — e o `pip`
     pega o apresentador em janelinha. Sem isso a chamada abre apresentando o apresentador,
-    que é justamente o que ela não deveria fazer.
+    que é justamente o que ela nêo deveria fazer.
     """
     return (c.get("visual") != "talking_head" and not c.get("pip")
             and float(c.get("rosto_pct") or 0) <= MAX_ROSTO)
 
 
 def escolher_cenas(cenas, plan, n=N_BLOCOS - 1, dur=DUR_CLIPE):
-    """Cenas visualmente interessantes, SEM apresentador, que não entraram no corte."""
+    """Cenas visualmente interessantes, SEM apresentador, que nêo entraram no corte."""
     usadas = _usadas(plan)
     def livre(c):
         meio = (c["ini"] + c["fim"]) / 2
@@ -85,7 +85,7 @@ def escolher_cenas(cenas, plan, n=N_BLOCOS - 1, dur=DUR_CLIPE):
 def extrair_clipes(video, cenas, destino, dur=DUR_CLIPE, tamanho=(1920, 1080, 25)):
     """Recorta cada cena num MP4 curto, H.264, na geometria do vídeo.
 
-    Recorta com ffmpeg em vez de mandar o `<video>` da composição apontar pro fonte inteiro:
+    Recorta com ffmpeg em vez de mandar o `<video>` da composiçêo apontar pro fonte inteiro:
     o fonte pode ser AV1 de 20 min (o Chrome do render nem sempre decodifica), e um clipe de
     2,6 s carrega instantaneamente no headless.
     """
@@ -120,8 +120,8 @@ def encurtar_fala(texto, orcamento=MAX_PALAVRAS_FALA):
 
     `truncar_por_orcamento` (do narrar) corta na fronteira de palavra quando nem a primeira
     frase cabe — o que num roteiro de vários períodos é aceitável, mas aqui cada fala é UMA
-    frase: o corte devolvia "...200 milhões de proteínas ganhou" e a narração parava no meio.
-    Aqui a regra é outra: descarta frases inteiras do fim; se sobrar só uma e ela não couber,
+    frase: o corte devolvia "...200 milhões de proteínas ganhou" e a narraçêo parava no meio.
+    Aqui a regra é outra: descarta frases inteiras do fim; se sobrar só uma e ela nêo couber,
     ela vai inteira mesmo assim. Bloco um pouco mais longo é melhor que frase quebrada.
     """
     if not texto:
@@ -141,10 +141,10 @@ def _esc(s):
 
 
 def montar_html(blocos, capa_jpg, clipes, W=1920, H=1080):
-    """Gera a composição HyperFrames da abertura (capa + blocos com vídeo e texto garrafal)."""
+    """Gera a composiçêo HyperFrames da abertura (capa + blocos com vídeo e texto garrafal)."""
     total = round(sum(b["dur"] for b in blocos), 2)
     # O <video> fica no NÍVEL DA RAIZ, nunca dentro da <section> temporizada: o extrator de
-    # quadros resolve o data-start do vídeo sem o offset do ancestral, então wrapper e vídeo
+    # quadros resolve o data-start do vídeo sem o offset do ancestral, entêo wrapper e vídeo
     # temporizados ao mesmo tempo discordam e o clipe mostra o quadro errado
     # (`video_nested_in_timed_element`). O fundo entra primeiro no DOM (fica atrás) e a
     # <section> por cima carrega só véu, faixa e texto.
@@ -155,8 +155,8 @@ def montar_html(blocos, capa_jpg, clipes, W=1920, H=1080):
             fundos.append(f'    <img class="bg clip" id="bg{k}" src="assets/capa.jpg" alt="" '
                           f'data-start="{t_:.2f}" data-duration="{b["dur"]:.2f}" data-track-index="{10 + k}">')
         else:
-            # vídeo NÃO leva class="clip" (o framework cuida de play/seek por data-start),
-            # mas PRECISA de id — sem id o renderer não o descobre e o clipe sai congelado.
+            # vídeo NêO leva class="clip" (o framework cuida de play/seek por data-start),
+            # mas PRECISA de id — sem id o renderer nêo o descobre e o clipe sai congelado.
             fundos.append(f'    <video class="bg" id="bg{k}" src="assets/clip_{k - 1}.mp4" '
                           f'data-start="{t_:.2f}" data-duration="{b["dur"]:.2f}" '
                           f'data-track-index="{10 + k}" data-volume="0" muted></video>')
@@ -277,8 +277,8 @@ def abertura(dir, cfg, provedor=None, forcar=False):
                  "-t", f"{MIN_BLOCO}", str(wav)])
         b["wav"] = float(run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
                               "-of", "csv=p=0", str(wav)]).strip())
-        # a duração do bloco SEGUE o áudio: sem isso o bloco acaba antes da fala dele e a
-        # narração invade o bloco seguinte, que já começou a falar (duas vozes ao mesmo tempo)
+        # a duraçêo do bloco SEGUE o áudio: sem isso o bloco acaba antes da fala dele e a
+        # narraçêo invade o bloco seguinte, que já começou a falar (duas vozes ao mesmo tempo)
         b["dur"] = round(max(MIN_BLOCO, b["wav"] + FOLGA_BLOCO), 2)
 
     total = sum(b["dur"] for b in blocos)
@@ -291,7 +291,7 @@ def abertura(dir, cfg, provedor=None, forcar=False):
     for f in (raiz / "assets" / "fonts").glob("*.woff2"):
         shutil.copy(f, ativos / "fonts" / f.name)
     html = montar_html(blocos, ativos / "capa.jpg", None, tamanho[0], tamanho[1])
-    # o fonts.css embutido aponta pra ./<arquivo>; aqui as fontes estão em assets/fonts/
+    # o fonts.css embutido aponta pra ./<arquivo>; aqui as fontes estêo em assets/fonts/
     html = html.replace("url('assets/fonts/", "url('assets/fonts/").replace("url('./", "url('assets/fonts/")
     (proj / "index.html").write_text(html)
 

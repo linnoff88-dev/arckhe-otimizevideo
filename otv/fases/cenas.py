@@ -9,13 +9,13 @@ VISUAIS_VALIDOS = ("talking_head", "slide", "demo_tela", "grafico", "outro")
 
 
 def proxy_cenas(video, destino, altura=360):
-    """Proxy H.264 pequeno para a detecção de cena. Reaproveita um já existente.
+    """Proxy H.264 pequeno para a detecçêo de cena. Reaproveita um já existente.
 
-    O PySceneDetect lê o vídeo pelo OpenCV, e o OpenCV desta máquina NÃO decodifica AV1
+    O PySceneDetect lê o vídeo pelo OpenCV, e o OpenCV desta máquina NêO decodifica AV1
     (que é o que o yt-dlp entrega em 1080p): em 2026-08-27 um vídeo AV1 de 20 min deu
     ZERO cenas, e o fallback silencioso de "uma cena cobrindo o vídeo inteiro" fez o
     modo B/C e o A+ ficarem sem nenhuma cena pra classificar. O ffmpeg decodifica AV1
-    sem problema, então transcodificamos uma vez para 360p H.264 e detectamos em cima
+    sem problema, entêo transcodificamos uma vez para 360p H.264 e detectamos em cima
     disso — de quebra é bem mais rápido que detectar em 1080p.
     """
     destino = Path(destino)
@@ -35,12 +35,12 @@ def detectar_cenas(video, proxy=None):
         dur = probe(video)["duracao_s"]
         if dur > 120:
             # Uma cena só num vídeo de mais de 2 min quase sempre significa que o
-            # decodificador do OpenCV não leu o arquivo (ver proxy_cenas) — não um vídeo
+            # decodificador do OpenCV nêo leu o arquivo (ver proxy_cenas) — nêo um vídeo
             # de plano único. Falhar alto: o silêncio aqui vira "nenhum talking_head"
-            # lá na frente, sem sinal nenhum de que a detecção não rodou.
+            # lá na frente, sem sinal nenhum de que a detecçêo nêo rodou.
             raise RuntimeError(
-                f"detecção de cena não achou nenhum corte em {dur:.0f}s de vídeo ({alvo}) — "
-                "provavelmente o OpenCV não decodificou esse codec; confira se o proxy H.264 foi gerado")
+                f"detecçêo de cena nêo achou nenhum corte em {dur:.0f}s de vídeo ({alvo}) — "
+                "provavelmente o OpenCV nêo decodificou esse codec; confira se o proxy H.264 foi gerado")
         return [(0.0, dur)]
     return [(s.seconds, e.seconds) for s, e in lista]  # get_seconds() está deprecated na 0.7.1
 
@@ -51,7 +51,7 @@ _det = None
 def _detector():
     """Detector de rosto em cache (mediapipe.tasks — API nova, mediapipe>=0.10).
 
-    A máquina de desenvolvimento tem mediapipe 1.0.1, que NÃO expõe mais
+    A máquina de desenvolvimento tem mediapipe 1.0.1, que NêO expõe mais
     `mp.solutions.face_detection` (API antiga). Usamos `mediapipe.tasks.python.vision`
     com o modelo blaze_face_short_range.tflite baixado em otv/modelos/.
     """
@@ -59,7 +59,7 @@ def _detector():
     if _det is None:
         if not _MODELO_ROSTO.exists():
             raise RuntimeError(
-                f"modelo de rosto não encontrado em {_MODELO_ROSTO} — "
+                f"modelo de rosto nêo encontrado em {_MODELO_ROSTO} — "
                 "copie blaze_face_short_range.tflite para otv/modelos/"
             )
         from mediapipe.tasks.python import vision
@@ -74,12 +74,12 @@ def _detector():
 
 
 def rosto_pct(jpg):
-    """Fração de área (largura relativa × altura relativa) do maior rosto na imagem.
+    """Fraçêo de área (largura relativa × altura relativa) do maior rosto na imagem.
 
     A API nova do mediapipe devolve o bounding box em PIXELS (origin_x, origin_y,
-    width, height), não em fração como a API antiga (`relative_bounding_box`).
+    width, height), nêo em fraçêo como a API antiga (`relative_bounding_box`).
     Por isso dividimos explicitamente pela largura/altura da imagem — sem isso o
-    contrato de "fração de área" quebra e o limiar de 0.08 do classificar_local
+    contrato de "fraçêo de área" quebra e o limiar de 0.08 do classificar_local
     fica sem sentido.
     """
     import mediapipe as mp, cv2
@@ -103,7 +103,7 @@ def rosto_pct(jpg):
 # UM limiar só pra "tem apresentador em quadro". Até 2026-08-27 havia dois: o
 # classificar_local usava 0.08 e o classificar (VLM) só sobrepunha o rótulo do modelo em
 # 0.15 — a faixa entre os dois era exatamente onde o apresentador se escondia. Uma cena de
-# rosto 0.1077 saía rotulada "demo_tela" e o modo A+ não a substituía, porque ele só troca
+# rosto 0.1077 saía rotulada "demo_tela" e o modo A+ nêo a substituía, porque ele só troca
 # o que está marcado talking_head.
 LIMIAR_ROSTO = 0.08
 

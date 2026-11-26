@@ -1,10 +1,10 @@
-# otimizevideo — Plano de implementação
+# otimizevideo — Plano de implementaçêo
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** CLI `otv` que condensa um vídeo de 20–30 min em ~2 min via transcrição → unidades cortáveis → pontuação por LLM (só ids) → seleção determinística → corte ffmpeg, com provedores trocáveis por `config.yaml`.
+**Goal:** CLI `otv` que condensa um vídeo de 20–30 min em ~2 min via transcriçêo → unidades cortáveis → pontuaçêo por LLM (só ids) → seleçêo determinística → corte ffmpeg, com provedores trocáveis por `config.yaml`.
 
-**Architecture:** Pipeline em fases, cada uma lê/escreve JSON numa pasta `trabalho/<id>/`; nenhuma fase conhece o provedor da outra. O núcleo (unidades + seleção + snap) é código puro e testado sem rede. Modelos entram em dois pontos apenas: pontuação (texto) e classificação visual (miniaturas), sempre por id, nunca por timestamp.
+**Architecture:** Pipeline em fases, cada uma lê/escreve JSON numa pasta `trabalho/<id>/`; nenhuma fase conhece o provedor da outra. O núcleo (unidades + seleçêo + snap) é código puro e testado sem rede. Modelos entram em dois pontos apenas: pontuaçêo (texto) e classificaçêo visual (miniaturas), sempre por id, nunca por timestamp.
 
 **Tech Stack:** Python 3.12, `requests`, `pyyaml`, `pytest`, `ffmpeg/ffprobe`, `yt-dlp`, `scenedetect[opencv]`, `mediapipe`; provedores: Groq (Whisper), OpenRouter (`z-ai/glm-5.3-flash`, `google/gemini-2.5-flash-lite`), Ollama local, inemavox (TTS chatterbox).
 
@@ -14,13 +14,13 @@
 
 - Keys **só** de `~/projetos/openpcbotv2/.env` e `~/projetos/wifi/.env`, lidas em runtime; nunca copiadas, logadas ou impressas.
 - Todo JSON de fase segue os contratos da spec §3.1 (`metadata.json`, `transcript.json`, `unidades.json`, `scenes.json`, `notas.json`, `plan.json`).
-- O LLM devolve **ids**, nunca timestamps; timestamps são sempre calculados pelo código.
-- OpenRouter com modelos `z-ai/glm-5.*-flash`: sempre enviar `"reasoning": {"effort": "low"}` (reasoning não pode ser desligado) e `max_tokens ≥ 20000`.
-- Timestamps de palavras são normalizados para monotônicos antes de qualquer uso (spec §11.4).
+- O LLM devolve **ids**, nunca timestamps; timestamps sêo sempre calculados pelo código.
+- OpenRouter com modelos `z-ai/glm-5.*-flash`: sempre enviar `"reasoning": {"effort": "low"}` (reasoning nêo pode ser desligado) e `max_tokens ≥ 20000`.
+- Timestamps de palavras sêo normalizados para monotônicos antes de qualquer uso (spec §11.4).
 - `min_segmento_s` aplica-se **depois** do snap (spec §11.4).
 - Saída final copiada para `~/projetos/output/otimizevideo/<id>/`; intermediários ficam em `trabalho/<id>/` (gitignored).
 - Commits neste repo com autor `inematds <inematds@gmail.com>` (já configurado localmente). Commit ao fim de cada task.
-- Testes unitários não acessam rede nem GPU; provedores externos só em testes marcados `@pytest.mark.integracao`.
+- Testes unitários nêo acessam rede nem GPU; provedores externos só em testes marcados `@pytest.mark.integracao`.
 
 ---
 
@@ -29,20 +29,20 @@
 ```
 otimizevideo/
   otv.py                       # CLI (argparse, subcomandos) — Task 11
-  config.yaml                  # slots + parâmetros de seleção — Task 1
+  config.yaml                  # slots + parâmetros de seleçêo — Task 1
   requirements.txt             # Task 1
   pytest.ini                   # Task 1
   otv/
     __init__.py
     config.py                  # carregar_config() — Task 1
-    contratos.py               # validação leve dos JSONs — Task 1
+    contratos.py               # validaçêo leve dos JSONs — Task 1
     util/keys.py               # key(nome) — Task 1
     util/ffmpeg.py             # probe(), extrair_audio(), thumb(), run() — Task 2
     util/custos.py             # registrar(dir, fase, dados) — Task 2
     fases/ingest.py            # Task 2
     fases/transcrever.py       # Task 3
     fases/unidades.py          # Task 4
-    fases/cenas.py             # detecção + rosto + classificação — Task 5
+    fases/cenas.py             # detecçêo + rosto + classificaçêo — Task 5
     fases/pontuar.py           # Task 7
     fases/selecionar.py        # Task 8 (núcleo)
     fases/render.py            # Task 9
@@ -63,7 +63,7 @@ otimizevideo/
 - Test: `tests/test_config.py`, `tests/test_keys.py`, `tests/test_contratos.py`
 
 **Interfaces:**
-- Produces: `carregar_config(path: Path|None = None) -> dict` (merge de defaults + yaml); `key(nome: str) -> str` (levanta `KeyError` se não achar); `validar_notas(raw: dict, n_unidades: int) -> dict` (retorna `{"topicos": [...], "notas": [...], "gancho": [...]}` limpos); `validar_plan(plan: dict) -> None` (levanta `ValueError`).
+- Produces: `carregar_config(path: Path|None = None) -> dict` (merge de defaults + yaml); `key(nome: str) -> str` (levanta `KeyError` se nêo achar); `validar_notas(raw: dict, n_unidades: int) -> dict` (retorna `{"topicos": [...], "notas": [...], "gancho": [...]}` limpos); `validar_plan(plan: dict) -> None` (levanta `ValueError`).
 
 - [ ] **Step 1: Arquivos de base**
 
@@ -191,7 +191,7 @@ def key(nome):
         for ln in f.read_text().splitlines():
             if ln.startswith(nome + "="):
                 return ln.split("=", 1)[1].strip().strip('"').strip("'")
-    raise KeyError(f"{nome} não encontrada em {[str(a) for a in ARQUIVOS]}")
+    raise KeyError(f"{nome} nêo encontrada em {[str(a) for a in ARQUIVOS]}")
 ```
 
 - [ ] **Step 5: Teste de contratos (falhando)**
@@ -419,7 +419,7 @@ git add otv tests && git commit -m "feat: ingest (yt-dlp/local), util ffmpeg e c
 
 ---
 
-### Task 3: Transcrição (Groq, whisper local) com normalização de timestamps
+### Task 3: Transcriçêo (Groq, whisper local) com normalizaçêo de timestamps
 
 **Files:**
 - Create: `otv/provedores/__init__.py`, `otv/provedores/transcricao.py`, `otv/fases/transcrever.py`
@@ -447,7 +447,7 @@ from otv.provedores.transcricao import normalizar_palavras, de_groq
 def test_normalizar_torna_monotonico():
     p = normalizar_palavras([{"t": "a", "ini": 0.0, "fim": 0.5}, {"t": "b", "ini": 0.4, "fim": 0.9},
                              {"t": "c", "ini": 1.85, "fim": 1.7}])
-    assert p[1]["ini"] == 0.5                 # não começa antes da anterior terminar
+    assert p[1]["ini"] == 0.5                 # nêo começa antes da anterior terminar
     assert p[2]["fim"] >= p[2]["ini"] + 0.05  # fim nunca antes do início
 
 def test_de_groq_contrato():
@@ -540,21 +540,21 @@ def transcrever(dir, cfg, provedor=None, forcar=False):
     prov = provedor or cfg["transcricao"]; t0 = time.time()
     t = PROVEDORES[prov](dir / "audio.opus", cfg)
     if len(t["palavras"]) < 50:
-        raise RuntimeError(f"transcrição com só {len(t['palavras'])} palavras — vídeo sem fala? (só modo C faz sentido)")
+        raise RuntimeError(f"transcriçêo com só {len(t['palavras'])} palavras — vídeo sem fala? (só modo C faz sentido)")
     out.write_text(json.dumps(t, ensure_ascii=False))
     registrar(dir, "transcrever", {"provedor": prov, "palavras": len(t["palavras"]), "segundos": round(time.time() - t0, 1)})
     return out
 ```
 
-- [ ] **Step 5: Rodar — PASS; e teste de integração manual**
+- [ ] **Step 5: Rodar — PASS; e teste de integraçêo manual**
 
 Run: `pytest tests/test_transcricao.py -v`
-Integração (opcional, rede): `python -c "from otv.fases.transcrever import transcrever; from otv.config import carregar_config; print(transcrever('trabalho/dQYKcjvXhIY', carregar_config(), forcar=True))"` → `transcript.json` com ~3000 palavras.
+Integraçêo (opcional, rede): `python -c "from otv.fases.transcrever import transcrever; from otv.config import carregar_config; print(transcrever('trabalho/dQYKcjvXhIY', carregar_config(), forcar=True))"` → `transcript.json` com ~3000 palavras.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add otv tests && git commit -m "feat: transcrição groq/whisper com normalização de timestamps"
+git add otv tests && git commit -m "feat: transcriçêo groq/whisper com normalizaçêo de timestamps"
 ```
 
 ---
@@ -578,7 +578,7 @@ from otv.fases.unidades import montar_unidades, atribuir_cenas
 def P(t, ini, fim): return {"t": t, "ini": ini, "fim": fim}
 
 def test_quebra_em_pontuacao_e_pausa():
-    pal = [P("Oi", 0, .3), P("tudo", .35, .6), P("bem.", .65, .9),      # frase 1 (pontuação)
+    pal = [P("Oi", 0, .3), P("tudo", .35, .6), P("bem.", .65, .9),      # frase 1 (pontuaçêo)
            P("Sim", 1.0, 1.3), P("claro", 1.35, 1.7),                    # frase 2 (pausa de 0.6 depois)
            P("vamos", 2.3, 2.6), P("lá", 2.65, 2.9), P("agora", 2.95, 3.3)]
     u = montar_unidades(pal, [], pausa_s=0.4)
@@ -591,8 +591,8 @@ def test_funde_unidade_curta_na_anterior():
     assert len(u) == 1 and u[0]["texto"] == "Primeira frase. Ok." and u[0]["fim"] == 1.3
 
 def test_corta_unidade_longa_na_maior_pausa():
-    pal = [P(f"p{i}", i * 1.0, i * 1.0 + 0.7) for i in range(15)]  # 15 s sem pontuação, pausas iguais de 0.3
-    pal[7]["fim"] = 7.55                                              # pausa maior (0.45) depois de p7 — abaixo de 0.4? não: usa fim_segmento
+    pal = [P(f"p{i}", i * 1.0, i * 1.0 + 0.7) for i in range(15)]  # 15 s sem pontuaçêo, pausas iguais de 0.3
+    pal[7]["fim"] = 7.55                                              # pausa maior (0.45) depois de p7 — abaixo de 0.4? nêo: usa fim_segmento
     u = montar_unidades(pal, fins_segmento=[7.55], pausa_s=0.6)
     assert len(u) == 2 and u[0]["texto"].endswith("p7")
 
@@ -664,7 +664,7 @@ def unidades(dir, cfg, forcar=False):
     registrar(dir, "unidades", {"quantidade": len(us), "media_s": round(sum(u["dur"] for u in us) / max(1, len(us)), 2)})
     return out
 ```
-Se `test_corta_unidade_longa_na_maior_pausa` falhar por causa da regra `longa and pausa >= 0.15`, ajuste a fixture (a intenção do teste é: com `fins_segmento` marcando 7.55, a unidade quebra ali).
+Se `test_corta_unidade_longa_na_maior_pausa` falhar por causa da regra `longa and pausa >= 0.15`, ajuste a fixture (a intençêo do teste é: com `fins_segmento` marcando 7.55, a unidade quebra ali).
 
 - [ ] **Step 4: Rodar — PASS**
 
@@ -678,15 +678,15 @@ git add otv tests && git commit -m "feat: unidades cortáveis a partir de palavr
 
 ---
 
-### Task 5: Cenas (PySceneDetect + rosto local) e classificação por VLM
+### Task 5: Cenas (PySceneDetect + rosto local) e classificaçêo por VLM
 
 **Files:**
 - Create: `otv/fases/cenas.py`, `prompts/classificar.md`
-- Modify: `otv/provedores/llm.py` (criado na Task 6 — **executar a Task 6 antes desta**, ou implementar só a parte local aqui e voltar na classificação)
+- Modify: `otv/provedores/llm.py` (criado na Task 6 — **executar a Task 6 antes desta**, ou implementar só a parte local aqui e voltar na classificaçêo)
 - Test: `tests/test_cenas.py`
 
 **Interfaces:**
-- Produces: `detectar_cenas(video: Path) -> list[tuple[float,float]]`; `rosto_pct(jpg: Path) -> float`; `classificar_local(rosto: float) -> str` (`talking_head` se ≥ 0.08, senão `outro`); `cenas(dir, cfg, forcar=False) -> Path` (escreve `scenes.json` + `thumbs/NNN.jpg`); `classificar(dir, cfg, provedor=None) -> Path` (enriquece `scenes.json` com `visual` e `descricao` via VLM em lotes de 20 imagens).
+- Produces: `detectar_cenas(video: Path) -> list[tuple[float,float]]`; `rosto_pct(jpg: Path) -> float`; `classificar_local(rosto: float) -> str` (`talking_head` se ≥ 0.08, senêo `outro`); `cenas(dir, cfg, forcar=False) -> Path` (escreve `scenes.json` + `thumbs/NNN.jpg`); `classificar(dir, cfg, provedor=None) -> Path` (enriquece `scenes.json` com `visual` e `descricao` via VLM em lotes de 20 imagens).
 
 - [ ] **Step 1: Teste local (falhando)**
 
@@ -763,23 +763,23 @@ def cenas(dir, cfg, forcar=False):
     registrar(dir, "cenas", {"quantidade": len(lista), "segundos": round(time.time() - t0, 1)})
     return out
 ```
-Se o `mediapipe` instalado for a API nova (`mediapipe.tasks`), adaptar `rosto_pct` para `vision.FaceDetector` com o modelo `blaze_face_short_range.tflite` baixado para `otv/modelos/`; a assinatura e o retorno não mudam.
+Se o `mediapipe` instalado for a API nova (`mediapipe.tasks`), adaptar `rosto_pct` para `vision.FaceDetector` com o modelo `blaze_face_short_range.tflite` baixado para `otv/modelos/`; a assinatura e o retorno nêo mudam.
 
 - [ ] **Step 4: Rodar — PASS**
 
 Run: `pytest tests/test_cenas.py -v`
 
-- [ ] **Step 5: Classificação por VLM (depende da Task 6)**
+- [ ] **Step 5: Classificaçêo por VLM (depende da Task 6)**
 
 `prompts/classificar.md`:
 ```
 Você recebe {n} imagens numeradas, uma por cena de um vídeo educativo.
 Classifique CADA imagem em exatamente uma categoria:
 - talking_head: pessoa falando para a câmera ocupa a cena
-- slide: slide de apresentação (título, bullets, texto grande)
-- demo_tela: gravação de tela, software, terminal, site, código
+- slide: slide de apresentaçêo (título, bullets, texto grande)
+- demo_tela: gravaçêo de tela, software, terminal, site, código
 - grafico: gráfico, tabela, diagrama, dado visual
-- outro: qualquer outra coisa (b-roll, logo, transição)
+- outro: qualquer outra coisa (b-roll, logo, transiçêo)
 Descreva em até 8 palavras o que aparece.
 Responda SOMENTE JSON: {"cenas":[{"i":0,"visual":"slide","descricao":"..."}, ...]} com todas as {n} imagens.
 ```
@@ -808,14 +808,14 @@ def classificar(dir, cfg, provedor=None, forcar=False):
     return dir / "scenes.json"
 ```
 
-- [ ] **Step 6: Integração manual**
+- [ ] **Step 6: Integraçêo manual**
 
 Run: `python -c "from otv.fases.cenas import cenas, classificar; from otv.config import carregar_config; c=carregar_config(); cenas('trabalho/dQYKcjvXhIY', c); classificar('trabalho/dQYKcjvXhIY', c, 'glm')"` e conferir `scenes.json`: cenas com `visual` variado e `descricao` preenchida.
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add otv prompts tests && git commit -m "feat: cenas (PySceneDetect + rosto) e classificação visual por VLM"
+git add otv prompts tests && git commit -m "feat: cenas (PySceneDetect + rosto) e classificaçêo visual por VLM"
 ```
 
 ---
@@ -859,7 +859,7 @@ def test_openrouter_manda_reasoning_low_e_retorna_json(monkeypatch):
     assert chamadas[0]["response_format"] == {"type": "json_object"}
 
 def test_retry_em_json_invalido(monkeypatch):
-    respostas = iter(['isso não é json', '{"ok":2}'])
+    respostas = iter(['isso nêo é json', '{"ok":2}'])
     class R:
         status_code = 200
         def json(self): return {"choices": [{"message": {"content": next(respostas)}}], "usage": {}}
@@ -909,7 +909,7 @@ class LLM:
     def chat_json(self, prompt, imagens=None):
         erro = None
         for tentativa in range(2):
-            texto, uso = self._chamar(prompt if tentativa == 0 else prompt + "\n\nATENÇÃO: sua resposta anterior não era JSON válido. Responda SOMENTE o JSON.", imagens)
+            texto, uso = self._chamar(prompt if tentativa == 0 else prompt + "\n\nATENÇêO: sua resposta anterior nêo era JSON válido. Responda SOMENTE o JSON.", imagens)
             try:
                 return extrair_json(texto), uso
             except ValueError as e:
@@ -972,7 +972,7 @@ git add otv tests && git commit -m "feat: provedor LLM (OpenRouter/Ollama) com c
 
 ---
 
-### Task 7: Pontuação (prompt, validação, fase)
+### Task 7: Pontuaçêo (prompt, validaçêo, fase)
 
 **Files:**
 - Create: `prompts/pontuar.md`, `otv/fases/pontuar.py`
@@ -985,14 +985,14 @@ git add otv tests && git commit -m "feat: provedor LLM (OpenRouter/Ollama) com c
 - [ ] **Step 1: `prompts/pontuar.md`**
 
 ```
-Você é um editor de vídeo experiente. Abaixo está a transcrição de um vídeo de {minutos} minutos ("{titulo}"),
-dividida em unidades numeradas, cada uma com duração e o tipo de imagem na tela.
+Você é um editor de vídeo experiente. Abaixo está a transcriçêo de um vídeo de {minutos} minutos ("{titulo}"),
+dividida em unidades numeradas, cada uma com duraçêo e o tipo de imagem na tela.
 Vamos condensar o vídeo em cerca de {alvo} segundos mantendo os trechos ORIGINAIS (corte extrativo, sem reescrever).
 Modo: {modo_desc}
 
 Tarefa:
-1. Para CADA unidade, dê "nota" de 0 a 10 = quão essencial ela é para o espectador entender o conteúdo central
-   (10 = tese, insight, número, resultado, demonstração-chave; 0 = saudação, patrocínio, repetição, enrolação, transição vazia)
+1. Para CADA unidade, dê "nota" de 0 a 10 = quêo essencial ela é para o espectador entender o conteúdo central
+   (10 = tese, insight, número, resultado, demonstraçêo-chave; 0 = saudaçêo, patrocínio, repetiçêo, enrolaçêo, transiçêo vazia)
    e um "motivo" de até 8 palavras.
 2. Liste os "topicos" do vídeo com o intervalo de ids (de → ate) que cada um cobre, em ordem.
 3. Indique "gancho": os ids de 1 ou 2 unidades que melhor ABREM o vídeo condensado (a frase que prende).
@@ -1004,7 +1004,7 @@ Inclua TODAS as {n} unidades em "notas", na ordem.
 UNIDADES:
 {lista}
 ```
-`modo_desc`: A → "condensado com a fala original: priorize o que se entende só ouvindo."; B → "sem o apresentador: a narração será refeita; priorize unidades cujo tipo de imagem é demo_tela, grafico ou slide, pois é a imagem que vai ficar."; C → "só demonstrações e gráficos: priorize demo_tela e grafico."
+`modo_desc`: A → "condensado com a fala original: priorize o que se entende só ouvindo."; B → "sem o apresentador: a narraçêo será refeita; priorize unidades cujo tipo de imagem é demo_tela, grafico ou slide, pois é a imagem que vai ficar."; C → "só demonstrações e gráficos: priorize demo_tela e grafico."
 
 - [ ] **Step 2: Testes (falhando)**
 
@@ -1051,7 +1051,7 @@ from otv.contratos import validar_notas
 from otv.util.custos import registrar
 
 MODOS = {"A": "condensado com a fala original: priorize o que se entende só ouvindo.",
-         "B": "sem o apresentador: a narração será refeita; priorize unidades cujo tipo de imagem é demo_tela, grafico ou slide, pois é a imagem que vai ficar.",
+         "B": "sem o apresentador: a narraçêo será refeita; priorize unidades cujo tipo de imagem é demo_tela, grafico ou slide, pois é a imagem que vai ficar.",
          "C": "só demonstrações e gráficos: priorize demo_tela e grafico."}
 
 def montar_lista(unidades):
@@ -1084,12 +1084,12 @@ Run: `pytest tests/test_pontuar.py -v`
 - [ ] **Step 6: Commit**
 
 ```bash
-git add otv prompts tests && git commit -m "feat: pontuação por LLM (ids, tópicos, gancho) com validação"
+git add otv prompts tests && git commit -m "feat: pontuaçêo por LLM (ids, tópicos, gancho) com validaçêo"
 ```
 
 ---
 
-### Task 8: Seleção (núcleo) — mochila, cota, coesão, gancho, snap, completar
+### Task 8: Seleçêo (núcleo) — mochila, cota, coesêo, gancho, snap, completar
 
 **Files:**
 - Create: `otv/fases/selecionar.py`
@@ -1236,7 +1236,7 @@ def selecionar_plan(unidades, notas, cenas, sel, modo, alvo_s):
     esc, total, por_topico = mochila(cands, teto, cota, topico_de, esc, total, por_topico)
     por_id = {u["id"]: u for u in unidades}; eleg_ids = {u["id"] for u in elegiveis}
     def _dur(ids): return sum(por_id[i]["dur"] for i in ids)
-    # 3. coesão: estende cada segmento pros vizinhos razoáveis até min_segmento_ideal_s
+    # 3. coesêo: estende cada segmento pros vizinhos razoáveis até min_segmento_ideal_s
     for s in segmentar(esc, unidades):
         ids = list(s["unidades"])
         while _dur(ids) < sel["min_segmento_ideal_s"]:
@@ -1297,17 +1297,17 @@ Run: `pytest tests/test_selecionar.py -v`
 
 - [ ] **Step 5: Verificar no vídeo real**
 
-Run: `python -c "from otv.fases.selecionar import selecionar; from otv.config import carregar_config; print(selecionar('trabalho/dQYKcjvXhIY', carregar_config()))"` (usa `unidades.json`/`notas.json` do spike — se o formato antigo não tiver `gancho`, `validar_notas` já tolera). Conferir: `total_s` entre 90 e 150, unidade 0 no primeiro segmento, nenhum segmento < 3 s, média por segmento ≥ 6 s.
+Run: `python -c "from otv.fases.selecionar import selecionar; from otv.config import carregar_config; print(selecionar('trabalho/dQYKcjvXhIY', carregar_config()))"` (usa `unidades.json`/`notas.json` do spike — se o formato antigo nêo tiver `gancho`, `validar_notas` já tolera). Conferir: `total_s` entre 90 e 150, unidade 0 no primeiro segmento, nenhum segmento < 3 s, média por segmento ≥ 6 s.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add otv tests && git commit -m "feat: seleção determinística (mochila, cota, coesão, gancho, snap, completar)"
+git add otv tests && git commit -m "feat: seleçêo determinística (mochila, cota, coesêo, gancho, snap, completar)"
 ```
 
 ---
 
-### Task 9: Render ffmpeg (trim/concat frame-accurate, `--rapido`, narração e extensão)
+### Task 9: Render ffmpeg (trim/concat frame-accurate, `--rapido`, narraçêo e extensêo)
 
 **Files:**
 - Create: `otv/fases/render.py`
@@ -1396,7 +1396,7 @@ def render(dir, cfg, rapido=False, sem_audio_original=False):
     registrar(dir, "render", {"rapido": rapido, "segundos": round(time.time() - t0, 1), "saida": str(dest / "output.mp4")})
     return out
 ```
-Nota: quando há narração, o `plan["narracao"]["arquivos"]` tem um caminho por segmento (ou `null` para segmento sem narração); o índice de entrada `[k+1:a]` assume um wav por segmento **na mesma ordem** — a Task 10 garante isso gerando um wav (silencioso se preciso) para todo segmento.
+Nota: quando há narraçêo, o `plan["narracao"]["arquivos"]` tem um caminho por segmento (ou `null` para segmento sem narraçêo); o índice de entrada `[k+1:a]` assume um wav por segmento **na mesma ordem** — a Task 10 garante isso gerando um wav (silencioso se preciso) para todo segmento.
 
 - [ ] **Step 4: Rodar — PASS**
 
@@ -1405,12 +1405,12 @@ Run: `pytest tests/test_render.py -v`
 - [ ] **Step 5: Commit**
 
 ```bash
-git add otv tests && git commit -m "feat: render ffmpeg (trim/concat, rapido, extensão, mix de narração)"
+git add otv tests && git commit -m "feat: render ffmpeg (trim/concat, rapido, extensêo, mix de narraçêo)"
 ```
 
 ---
 
-### Task 10: Narração (modo B): roteiro por LLM, TTS inemavox/ElevenLabs, ajuste de duração
+### Task 10: Narraçêo (modo B): roteiro por LLM, TTS inemavox/ElevenLabs, ajuste de duraçêo
 
 **Files:**
 - Create: `prompts/narrar.md`, `otv/provedores/tts.py`, `otv/fases/narrar.py`
@@ -1423,11 +1423,11 @@ git add otv tests && git commit -m "feat: render ffmpeg (trim/concat, rapido, ex
 - [ ] **Step 1: `prompts/narrar.md`**
 
 ```
-Você escreve narração em português do Brasil para um vídeo condensado SEM o apresentador: só as imagens
-(demonstrações, gráficos, slides) ficaram. Abaixo estão os segmentos mantidos, com o que era dito neles e
-o contexto em volta. Para CADA segmento escreva uma narração clara, direta, em 1ª pessoa do plural ou impessoal,
-com no máximo {ppm} palavras por segundo × duração do segmento (ex.: segmento de 8 s → até {ex} palavras).
-Não invente fatos: use só o que está nas falas. Não cumprimente, não conclua com frases vazias.
+Você escreve narraçêo em português do Brasil para um vídeo condensado SEM o apresentador: só as imagens
+(demonstrações, gráficos, slides) ficaram. Abaixo estêo os segmentos mantidos, com o que era dito neles e
+o contexto em volta. Para CADA segmento escreva uma narraçêo clara, direta, em 1ª pessoa do plural ou impessoal,
+com no máximo {ppm} palavras por segundo × duraçêo do segmento (ex.: segmento de 8 s → até {ex} palavras).
+Nêo invente fatos: use só o que está nas falas. Nêo cumprimente, nêo conclua com frases vazias.
 Responda SOMENTE JSON: {{"narracao":[{{"k":0,"texto":"..."}}, ...]}} com todos os {n} segmentos, na ordem.
 
 SEGMENTOS:
@@ -1444,7 +1444,7 @@ import otv.fases.narrar as Nn
 
 def test_ajustar_extensao():
     segs = [{"in": 0, "out": 5.0}, {"in": 10, "out": 14.0}]
-    ajustar_extensao(segs, [4.0, 6.5])          # narração 4 s cabe; 6.5 s excede 2.5 s
+    ajustar_extensao(segs, [4.0, 6.5])          # narraçêo 4 s cabe; 6.5 s excede 2.5 s
     assert segs[0]["estender_s"] == 0 and segs[1]["estender_s"] == 2.5
 
 def test_narrar_gera_wavs_e_atualiza_plan(tmp_path, monkeypatch):
@@ -1570,14 +1570,14 @@ def narrar(dir, cfg, provedor=None):
 
 Run: `pytest tests/test_narrar.py -v`
 
-- [ ] **Step 7: Integração manual do inemavox (daemon em :8010 precisa estar rodando)**
+- [ ] **Step 7: Integraçêo manual do inemavox (daemon em :8010 precisa estar rodando)**
 
-Run: `python -c "from otv.provedores.tts import tts_inemavox; print(tts_inemavox('Teste de narração.', '/tmp/t.wav'))"` — se o campo do job não for `id`/`status`, ajustar `CAMPO_ID`/`STATUS_OK` conforme a resposta real de `GET /api/jobs`.
+Run: `python -c "from otv.provedores.tts import tts_inemavox; print(tts_inemavox('Teste de narraçêo.', '/tmp/t.wav'))"` — se o campo do job nêo for `id`/`status`, ajustar `CAMPO_ID`/`STATUS_OK` conforme a resposta real de `GET /api/jobs`.
 
 - [ ] **Step 8: Commit**
 
 ```bash
-git add otv prompts tests && git commit -m "feat: narração modo B (roteiro LLM, TTS inemavox/elevenlabs, extensão)"
+git add otv prompts tests && git commit -m "feat: narraçêo modo B (roteiro LLM, TTS inemavox/elevenlabs, extensêo)"
 ```
 
 ---
@@ -1605,7 +1605,7 @@ def test_help_lista_subcomandos():
 
 def test_status_pasta_inexistente():
     r = subprocess.run([sys.executable, "otv.py", "status", "nao-existe"], capture_output=True, text=True)
-    assert r.returncode != 0 and "não encontrada" in (r.stdout + r.stderr)
+    assert r.returncode != 0 and "nêo encontrada" in (r.stdout + r.stderr)
 ```
 
 - [ ] **Step 2: Rodar — falha**
@@ -1627,7 +1627,7 @@ ARTEFATOS = ["video.mp4", "audio.opus", "metadata.json", "transcript.json", "sce
 def pasta(cfg, id_):
     d = Path(cfg["trabalho"]) / id_
     if not d.exists():
-        sys.exit(f"pasta de trabalho não encontrada: {d}")
+        sys.exit(f"pasta de trabalho nêo encontrada: {d}")
     return d
 
 def cmd_run(a, cfg):
@@ -1661,7 +1661,7 @@ def cmd_custo(a, cfg):
     for fase, v in c.items():
         usd = (v.get("uso") or {}).get("cost") or 0; total += usd
         print(f"  {fase:12s} {v.get('segundos', '-'):>7} s  US${usd:.4f}  {v.get('provedor', v.get('llm', ''))}")
-    print(f"  total US${total:.4f} (transcrição Groq não reporta custo: ~US$0,04/h)")
+    print(f"  total US${total:.4f} (transcriçêo Groq nêo reporta custo: ~US$0,04/h)")
 
 def main():
     p = argparse.ArgumentParser(prog="otv", description=__doc__)
@@ -1706,7 +1706,7 @@ Run: `pytest -v` (suíte inteira)
 
 - [ ] **Step 5: README.md**
 
-Conteúdo mínimo: o que faz (1 parágrafo), instalação (`pip install -r requirements.txt`, ffmpeg/yt-dlp, keys em `~/projetos/openpcbotv2/.env`), uso (`python otv.py run <url> --modo A --alvo 120`), tabela dos slots do `config.yaml` com os provedores disponíveis, como editar `plan.json` e re-renderizar (`otv selecionar` / `otv render`), custo típico (~US$0,03/vídeo), links pra spec e pesquisa em `docs/`.
+Conteúdo mínimo: o que faz (1 parágrafo), instalaçêo (`pip install -r requirements.txt`, ffmpeg/yt-dlp, keys em `~/projetos/openpcbotv2/.env`), uso (`python otv.py run <url> --modo A --alvo 120`), tabela dos slots do `config.yaml` com os provedores disponíveis, como editar `plan.json` e re-renderizar (`otv selecionar` / `otv render`), custo típico (~US$0,03/vídeo), links pra spec e pesquisa em `docs/`.
 
 - [ ] **Step 6: Commit**
 
@@ -1716,11 +1716,11 @@ git add otv.py README.md tests && git commit -m "feat: CLI otv (run, fases, stat
 
 ---
 
-### Task 12: Validação ponta a ponta no vídeo de exemplo (integração)
+### Task 12: Validaçêo ponta a ponta no vídeo de exemplo (integraçêo)
 
 **Files:**
-- Modify: `docs/superpowers/specs/2026-08-27-otimizevideo-design.md` (§11: acrescentar resultado da validação)
-- Create: `FALHAS.md` (se alguma falha real ocorrer, uma linha por falha no formato `| data | o que quebrou | menor correção | prompt \| infra |`)
+- Modify: `docs/superpowers/specs/2026-08-27-otimizevideo-design.md` (§11: acrescentar resultado da validaçêo)
+- Create: `FALHAS.md` (se alguma falha real ocorrer, uma linha por falha no formato `| data | o que quebrou | menor correçêo | prompt \| infra |`)
 
 - [ ] **Step 1: Modo A completo com defaults**
 
@@ -1736,25 +1736,25 @@ Run: `python otv.py custo dQYKcjvXhIY` → total ≲ US$0,02 nas chamadas OpenRo
 Run: `python otv.py pontuar dQYKcjvXhIY --provedor gemini --forcar && python otv.py selecionar dQYKcjvXhIY && python otv.py render dQYKcjvXhIY`
 Esperado: novo `plan.json` (comparar ids com o anterior; espera-se ~50–70 % em comum), render ok.
 
-- [ ] **Step 4: Modo B (com classificação visual)**
+- [ ] **Step 4: Modo B (com classificaçêo visual)**
 
 Run: `python otv.py run "https://www.youtube.com/watch?v=dQYKcjvXhIY" --modo B --visual glm`
-Esperado: `scenes.json` com `visual` variado; `plan.json` só com segmentos `slide|demo_tela|grafico`; `roteiro.md` gerado; `narracao/seg_*.wav`; `output.mp4` com narração por cima e cama a −18 dB. Se este vídeo for majoritariamente talking head, a fase avisa e pede modo A — registrar isso na spec como comportamento esperado.
+Esperado: `scenes.json` com `visual` variado; `plan.json` só com segmentos `slide|demo_tela|grafico`; `roteiro.md` gerado; `narracao/seg_*.wav`; `output.mp4` com narraçêo por cima e cama a −18 dB. Se este vídeo for majoritariamente talking head, a fase avisa e pede modo A — registrar isso na spec como comportamento esperado.
 
 - [ ] **Step 5: Re-corte manual**
 
-Editar `trabalho/dQYKcjvXhIY/plan.json` (remover um segmento), rodar `python otv.py render dQYKcjvXhIY` → saída reflete a edição, sem nenhuma chamada de modelo (conferir que `custos.json` não ganhou entrada nova de `pontuar`).
+Editar `trabalho/dQYKcjvXhIY/plan.json` (remover um segmento), rodar `python otv.py render dQYKcjvXhIY` → saída reflete a ediçêo, sem nenhuma chamada de modelo (conferir que `custos.json` nêo ganhou entrada nova de `pontuar`).
 
 - [ ] **Step 6: Registrar resultados e commitar**
 
 Adicionar em §11 da spec: durações, custos e o que foi ajustado. Se ocorreu falha real, linha em `FALHAS.md`.
 ```bash
-git add docs FALHAS.md 2>/dev/null; git commit -m "docs: validação ponta a ponta no vídeo de exemplo"
+git add docs FALHAS.md 2>/dev/null; git commit -m "docs: validaçêo ponta a ponta no vídeo de exemplo"
 ```
 
 ---
 
-## Adendo (revisão do usuário, spec §11b): fecho, manchete, substituir apresentador
+## Adendo (revisêo do usuário, spec §11b): fecho, manchete, substituir apresentador
 
 Estas mudanças se aplicam por cima das tasks acima. O executor lê a task e este adendo juntos.
 
@@ -1769,7 +1769,7 @@ def test_validar_notas_fecho_e_manchete():
 **Task 7 — prompt** é o arquivo `prompts/pontuar.md` já commitado (com manchete/gancho/fecho e escala de
 notas). `pontuar()` grava `manchete`, `gancho`, `fecho` no `notas.json`.
 
-**Task 8 — seleção.** Substituir o passo "1. gancho forçado" por:
+**Task 8 — seleçêo.** Substituir o passo "1. gancho forçado" por:
 ```python
     # 1. âncoras: gancho (início) e fecho (fim), estendidas pros vizinhos até o mínimo
     def ancorar(ids):
@@ -1803,13 +1803,13 @@ def test_fecho_forcado_e_estendido():
                   f"drawtext=text='{texto}':fontcolor=white:fontsize=h*0.055:x=(w-text_w)/2:y=h*0.05:"
                   f"alpha='if(lt(t,0.5),t*2,if(lt(t,3.5),1,(4-t)*2))':enable='lt(t,4)'[v]")
 ```
-no lugar de `[vc]null[v]`. Fonte: usar `fontfile=` da DejaVu Sans se o ffmpeg não achar fonte padrão
+no lugar de `[vc]null[v]`. Fonte: usar `fontfile=` da DejaVu Sans se o ffmpeg nêo achar fonte padrêo
 (`fc-match DejaVuSans`). Teste: `montar_filtro([...], manchete="A:B")` contém `drawtext=text='A\\:B'`.
 
 **Task 10b (nova) — modo A+ `--substituir gerado`.** Para cada segmento com `visual == "talking_head"`
 no `plan.json`: gerar uma imagem 16:9 com flux2-klein (prompt = `descricao` da cena + tópico + "editorial
 illustration, dark, no text"), salvar em `subst/seg_NN.png`, e no render trocar `[0:v]trim=…` por
-`movie=subst/seg_NN.png,loop=…,zoompan` (Ken Burns lento) com a **mesma duração**, mantendo `[0:a]atrim`
+`movie=subst/seg_NN.png,loop=…,zoompan` (Ken Burns lento) com a **mesma duraçêo**, mantendo `[0:a]atrim`
 do áudio original. Provedor de imagem: o que o usuário já usa (flux2-klein via fal/Magnific conforme
 `config.yaml → imagem:`). Entra depois das Tasks 1–11; testes com gerador mockado que escreve um PNG sólido.
 
@@ -1844,14 +1844,14 @@ def test_claude_cli_chama_binario_e_parseia(monkeypatch):
 ```
 Limites: sem vídeo (só imagens — compatível com a técnica de miniaturas); mais lento que a API; em lote grande
 respeitar o rate limit da assinatura. **Default pessoal recomendado:** `pontuacao: claude_cli` (sonnet); `glm`
-como fallback barato pra automação.
+como fallback barato pra automaçêo.
 
-**Task 12 — validação** ganha: (a) `status` mostra `manchete` e quais segmentos são `talking_head`;
+**Task 12 — validaçêo** ganha: (a) `status` mostra `manchete` e quais segmentos sêo `talking_head`;
 (b) rodar `--substituir gerado` no vídeo de exemplo e conferir que os 7 trechos com apresentador foram
 trocados e o áudio continua o original; (c) confirmar que o último segmento contém a unidade do `fecho`.
 
 ## Self-review
 
-- **Cobertura da spec:** §3 contratos → T1; §3.2 config → T1; §4.1 unidades → T4; §4.2 pontuação → T6+T7; §4.3 seleção (todas as 8 regras) + §11.5–11.7 (completar, coesão, gancho) → T8; §4.4 modo B → T10 + T9 (mix/extensão); §4.5 visual local/3b → T5 (3c "vídeo inteiro via Gemini Files API" fica **fora deste plano**, é slot futuro — anotado como YAGNI até aparecer vídeo onde a fala não basta); §5 ingest/transcrição/render → T2/T3/T9; §6 CLI → T11; §8 erros → distribuídos (retry em T3/T6, transcrição vazia em T3, seleção abaixo de 50 % e modo B sem cenas em T8, arquivo > limite: Groq aceita opus 32k de 30 min ≈ 7 MB, então o fatiamento não foi implementado — se um vídeo > 100 min aparecer, adicionar); §9 testes → todas as tasks; §11.1 reasoning low → T6; §11.4 normalização + mínimo pós-snap → T3/T8.
-- **Placeholders:** nenhum "TBD"; o único ponto a confirmar em runtime (campos `id`/`status` do inemavox) tem instrução concreta de como confirmar e onde ajustar.
+- **Cobertura da spec:** §3 contratos → T1; §3.2 config → T1; §4.1 unidades → T4; §4.2 pontuaçêo → T6+T7; §4.3 seleçêo (todas as 8 regras) + §11.5–11.7 (completar, coesêo, gancho) → T8; §4.4 modo B → T10 + T9 (mix/extensêo); §4.5 visual local/3b → T5 (3c "vídeo inteiro via Gemini Files API" fica **fora deste plano**, é slot futuro — anotado como YAGNI até aparecer vídeo onde a fala nêo basta); §5 ingest/transcriçêo/render → T2/T3/T9; §6 CLI → T11; §8 erros → distribuídos (retry em T3/T6, transcriçêo vazia em T3, seleçêo abaixo de 50 % e modo B sem cenas em T8, arquivo > limite: Groq aceita opus 32k de 30 min ≈ 7 MB, entêo o fatiamento nêo foi implementado — se um vídeo > 100 min aparecer, adicionar); §9 testes → todas as tasks; §11.1 reasoning low → T6; §11.4 normalizaçêo + mínimo pós-snap → T3/T8.
+- **Placeholders:** nenhum "TBD"; o único ponto a confirmar em runtime (campos `id`/`status` do inemavox) tem instruçêo concreta de como confirmar e onde ajustar.
 - **Consistência de nomes:** `chat_json` (T6) usado em T5/T7/T10; `criar_llm(cfg, slot)` idem; `validar_notas` (T1) em T7; `registrar` (T2) em todas; `probe/thumb/run` (T2) em T5/T9/T10; contrato de `plan["narracao"]["arquivos"]` definido em T10 e consumido em T9; `estender_s` escrito em T8 (0) e T10, lido em T9.

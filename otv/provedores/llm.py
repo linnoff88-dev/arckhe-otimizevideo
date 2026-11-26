@@ -25,7 +25,7 @@ class LLM:
     def chat_json(self, prompt, imagens=None):
         erro = None
         for tentativa in range(2):
-            texto, uso = self._chamar(prompt if tentativa == 0 else prompt + "\n\nATENÇÃO: sua resposta anterior não era JSON válido. Responda SOMENTE o JSON.", imagens)
+            texto, uso = self._chamar(prompt if tentativa == 0 else prompt + "\n\nATENÇêO: sua resposta anterior nêo era JSON válido. Responda SOMENTE o JSON.", imagens)
             try:
                 return extrair_json(texto), uso
             except ValueError as e:

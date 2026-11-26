@@ -1,9 +1,9 @@
 """Fila serial de jobs do painel — um por vez.
 
 Cada job é um subprocesso `python3 otv.py ...` com stdout+stderr indo pra um arquivo de log.
-Subprocesso (e não import direto) por três motivos: um crash de ffmpeg/mediapipe não derruba
+Subprocesso (e nêo import direto) por três motivos: um crash de ffmpeg/mediapipe nêo derruba
 o servidor, o log já sai pronto dos print() das fases, e o job continua vivo se o browser
-fechar. A fila é serial de propósito — a detecção de cena é CPU-bound e dois jobs em paralelo
+fechar. A fila é serial de propósito — a detecçêo de cena é CPU-bound e dois jobs em paralelo
 só se atrapalham.
 """
 import json, os, subprocess, sys, threading, time, uuid
@@ -69,9 +69,9 @@ class Fila:
         if visual:
             cmd += ["--visual", str(visual)]
         if substituir:
-            # modo A+: troca o vídeo dos trechos de apresentador por ilustração gerada,
-            # mantendo o áudio original. Depende do campo `visual` do plano, então só
-            # funciona de verdade com classificação por modelo (visual=glm/gemini/claude_cli).
+            # modo A+: troca o vídeo dos trechos de apresentador por ilustraçêo gerada,
+            # mantendo o áudio original. Depende do campo `visual` do plano, entêo só
+            # funciona de verdade com classificaçêo por modelo (visual=glm/gemini/claude_cli).
             cmd += ["--substituir", "gerado"]
         if abertura:
             cmd += ["--abertura"]
@@ -81,7 +81,7 @@ class Fila:
 
     def cmd_fase(self, fase, id_, modo=None, alvo=None):
         if fase not in FASES_ISOLADAS:
-            raise ValueError(f"fase não permitida pelo painel: {fase!r}")
+            raise ValueError(f"fase nêo permitida pelo painel: {fase!r}")
         cmd = self._base() + [fase, str(id_)]
         if fase == "selecionar":
             if modo:
@@ -131,7 +131,7 @@ class Fila:
                                            env={**os.environ, "PYTHONUNBUFFERED": "1"})
                 j.codigo = j._proc.wait()
             j.estado = "ok" if j.codigo == 0 else "erro"
-        except Exception as e:                      # noqa: BLE001 — o painel não pode morrer por causa de um job
+        except Exception as e:                      # noqa: BLE001 — o painel nêo pode morrer por causa de um job
             j.estado, j.codigo = "erro", -1
             try:
                 with open(j.log, "a") as f:

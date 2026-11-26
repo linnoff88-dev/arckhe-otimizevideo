@@ -1,15 +1,15 @@
-"""Edição do plan.json pelo painel.
+"""Ediçêo do plan.json pelo painel.
 
-O README (seção 9) sempre disse que dá pra editar o `plan.json` na mão e re-renderizar sem
+O README (seçêo 9) sempre disse que dá pra editar o `plan.json` na mêo e re-renderizar sem
 chamar modelo nenhum — é o que dá controle editorial sobre a escolha automática. Este módulo
-é essa mesma edição, pela tela, com as validações que um editor de texto não faz.
+é essa mesma ediçêo, pela tela, com as validações que um editor de texto nêo faz.
 
 Duas garantias que existem porque a entrada vem da rede:
-- só `in`, `out` e a inclusão do segmento (mais a manchete) são editáveis; todo o resto do
+- só `in`, `out` e a inclusêo do segmento (mais a manchete) sêo editáveis; todo o resto do
   segmento (`unidades`, `visual`, `substituir`, `texto`) é preservado do plano original,
-  casando por índice. Assim um POST malformado não consegue inventar campo nem apagar o que
+  casando por índice. Assim um POST malformado nêo consegue inventar campo nem apagar o que
   o pipeline calculou;
-- o plano antigo é copiado para `plan.bak.json` antes de gravar, então uma edição ruim é
+- o plano antigo é copiado para `plan.bak.json` antes de gravar, entêo uma ediçêo ruim é
   reversível sem re-rodar nada.
 """
 import json, shutil
@@ -19,7 +19,7 @@ MIN_SEG_S = 0.3
 
 
 class Invalido(ValueError):
-    """Edição recusada — a mensagem vai direto pro usuário na tela."""
+    """Ediçêo recusada — a mensagem vai direto pro usuário na tela."""
 
 
 def _num(v, campo, i):
@@ -30,7 +30,7 @@ def _num(v, campo, i):
 
 
 def aplicar(plano, edicao, duracao_s=None):
-    """Devolve o plano novo. Não escreve nada — quem escreve é salvar()."""
+    """Devolve o plano novo. Nêo escreve nada — quem escreve é salvar()."""
     segs = plano.get("segmentos") or []
     pedidos = edicao.get("segmentos")
     if pedidos is None:
@@ -56,7 +56,7 @@ def aplicar(plano, edicao, duracao_s=None):
             if base["in"] < 0:
                 raise Invalido(f"segmento {i}: início negativo ({base['in']}s)")
             if duracao_s and base["out"] > duracao_s + 0.5:
-                raise Invalido(f"segmento {i}: fim ({base['out']}s) passa da duração do "
+                raise Invalido(f"segmento {i}: fim ({base['out']}s) passa da duraçêo do "
                                f"vídeo ({duracao_s:.1f}s)")
             novos.append(base)
         if not novos:
@@ -70,8 +70,8 @@ def aplicar(plano, edicao, duracao_s=None):
         if m is not None and not isinstance(m, str):
             raise Invalido("manchete precisa ser texto")
         saida["manchete"] = (m or "").strip() or None
-    # a narração foi gerada para os segmentos ANTIGOS: um wav por segmento, casado por
-    # posição. Mexer na lista invalida esse casamento, e o render falha com uma mensagem
+    # a narraçêo foi gerada para os segmentos ANTIGOS: um wav por segmento, casado por
+    # posiçêo. Mexer na lista invalida esse casamento, e o render falha com uma mensagem
     # sobre contagem de arquivos. Melhor limpar aqui e dizer o que fazer.
     if saida.get("narracao") and pedidos is not None and len(novos) != len(segs):
         saida["narracao"] = None
@@ -80,11 +80,11 @@ def aplicar(plano, edicao, duracao_s=None):
 
 
 def salvar(dir, edicao):
-    """Aplica a edição no plan.json da pasta. Devolve (plano_novo, avisos)."""
+    """Aplica a ediçêo no plan.json da pasta. Devolve (plano_novo, avisos)."""
     dir = Path(dir)
     arq = dir / "plan.json"
     if not arq.exists():
-        raise Invalido("esta rodada não tem plan.json — rode a seleção antes")
+        raise Invalido("esta rodada nêo tem plan.json — rode a seleçêo antes")
     plano = json.loads(arq.read_text())
     meta = {}
     if (dir / "metadata.json").exists():
@@ -95,7 +95,7 @@ def salvar(dir, edicao):
     novo = aplicar(plano, edicao, meta.get("duracao_s"))
     avisos = []
     if novo.pop("narracao_invalidada", False):
-        avisos.append("a narração foi descartada porque o número de segmentos mudou — "
+        avisos.append("a narraçêo foi descartada porque o número de segmentos mudou — "
                       "rode 'narrar' de novo antes do render se o modo for B ou N")
     shutil.copy(arq, dir / "plan.bak.json")
     arq.write_text(json.dumps(novo, ensure_ascii=False, indent=1))

@@ -28,13 +28,13 @@ def _pasta(tmp_path, segmentos, cenas=None, notas=None):
 
 
 def test_montar_prompt_usa_a_fala_e_nao_a_descricao_do_apresentador():
-    # a descrição da cena, num trecho talking_head, descreve o apresentador -- usá-la como
+    # a descriçêo da cena, num trecho talking_head, descreve o apresentador -- usá-la como
     # prompt gerava outro apresentador (falha real de 2026-08-27, primeira rodada da 10b)
     p = montar_prompt("ratos cegos voltaram a enxergar depois de três genes",
                       "envelhecimento", descricao="homem de terno falando para a câmera")
     assert "ratos cegos voltaram a enxergar depois de três genes. envelhecimento" in p
     assert "homem de terno" not in p
-    # o modo A+ existe para tirar gente da tela; negação ("no people") o flux ignora, então
+    # o modo A+ existe para tirar gente da tela; negaçêo ("no people") o flux ignora, entêo
     # o prompt manda POSITIVAMENTE desenhar só objetos/ambientes
     assert "Depict only objects" in p and "Empty of any person" in p
     assert "unlettered" in p
@@ -42,7 +42,7 @@ def test_montar_prompt_usa_a_fala_e_nao_a_descricao_do_apresentador():
 
 def test_montar_prompt_cai_na_descricao_so_sem_texto():
     assert "Theme: gráfico de barras subindo." in montar_prompt("", "", descricao="gráfico de barras subindo")
-    # campos vazios não deixam vírgula solta
+    # campos vazios nêo deixam vírgula solta
     assert montar_prompt(None, "").startswith("Conceptual editorial illustration")
 
 

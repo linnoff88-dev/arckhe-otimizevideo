@@ -1,4 +1,4 @@
-"""Provedor de imagem (Task 10b) — gera a ilustração que substitui o apresentador.
+"""Provedor de imagem (Task 10b) — gera a ilustraçêo que substitui o apresentador.
 
 Só existe um provedor real: fal.ai rodando flux-2-klein (o default pessoal do usuário
 para imagem). O contrato é mínimo de propósito — `gerar(prompt, destino) -> uso` —
@@ -33,7 +33,7 @@ class Fal(Imagem):
         j = r.json()
         imgs = j.get("images") or []
         if not imgs or not imgs[0].get("url"):
-            raise RuntimeError(f"fal não devolveu imagem: {str(j)[:200]}")
+            raise RuntimeError(f"fal nêo devolveu imagem: {str(j)[:200]}")
         # download atômico: um .parte renomeado no fim, pra que um PNG truncado por
         # queda de rede nunca seja reaproveitado como "já gerado" na próxima rodada.
         destino = Path(destino); destino.parent.mkdir(parents=True, exist_ok=True)

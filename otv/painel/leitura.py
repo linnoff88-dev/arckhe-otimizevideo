@@ -1,7 +1,7 @@
 """Leitura das rodadas em trabalho/ — sem lógica nova, só o que o CLI já lia.
 
 Este módulo é a única fonte de verdade sobre "o que já rodou": tanto o `otv status`/
-`otv custo` quanto o painel passam por aqui, pra não existirem duas versões que divergem.
+`otv custo` quanto o painel passam por aqui, pra nêo existirem duas versões que divergem.
 Nada aqui escreve em disco nem chama modelo.
 """
 import json
@@ -28,7 +28,7 @@ def custo_total(custos):
 
 
 def fases_custo(custos):
-    """[(fase, segundos, usd, provedor)] na ordem em que estão no arquivo."""
+    """[(fase, segundos, usd, provedor)] na ordem em que estêo no arquivo."""
     saida = []
     for fase, v in (custos or {}).items():
         if not isinstance(v, dict):

@@ -1,12 +1,12 @@
 """Servidor HTTP do painel — stdlib, sem framework.
 
-Escuta em 0.0.0.0 por padrão (acessível na LAN). Sem autenticação a menos que
+Escuta em 0.0.0.0 por padrêo (acessível na LAN). Sem autenticaçêo a menos que
 OTV_PAINEL_TOKEN esteja definido, e nesse caso todo request precisa de ?t=<token>.
 
 Duas travas que existem porque isto fica exposto na rede:
 - todo comando é lista de argumentos pro Popen, NUNCA string de shell (ver fila.py);
 - todo id de pasta é resolvido e conferido contra a raiz de trabalho antes de virar caminho
-  de arquivo, senão '../../etc/passwd' viraria download.
+  de arquivo, senêo '../../etc/passwd' viraria download.
 """
 import json, mimetypes, os, re, secrets
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -45,7 +45,7 @@ class Handler(BaseHTTPRequestHandler):
     server_version = "otv-painel"
 
     def log_message(self, fmt, *args):
-        pass  # o log útil é o dos jobs, não o de acesso
+        pass  # o log útil é o dos jobs, nêo o de acesso
 
     # ---- helpers -------------------------------------------------------------
     def _json(self, obj, codigo=200):
@@ -76,10 +76,10 @@ class Handler(BaseHTTPRequestHandler):
             return {}
 
     def _arquivo(self, caminho, parcial=True):
-        """Serve um arquivo com suporte a Range — sem isso o player não deixa dar seek."""
+        """Serve um arquivo com suporte a Range — sem isso o player nêo deixa dar seek."""
         caminho = Path(caminho)
         if not caminho.is_file():
-            return self._erro(404, "arquivo não encontrado")
+            return self._erro(404, "arquivo nêo encontrado")
         tam = caminho.stat().st_size
         tipo = mimetypes.guess_type(str(caminho))[0] or "application/octet-stream"
         faixa = self.headers.get("Range", "") if parcial else ""
@@ -111,7 +111,7 @@ class Handler(BaseHTTPRequestHandler):
                 try:
                     self.wfile.write(pedaco)
                 except (BrokenPipeError, ConnectionResetError):
-                    return          # player fechou/pulou: normal, não é erro
+                    return          # player fechou/pulou: normal, nêo é erro
                 resta -= len(pedaco)
 
     # ---- rotas ---------------------------------------------------------------
@@ -132,11 +132,11 @@ class Handler(BaseHTTPRequestHandler):
                                        "visual": P.cfg["visual"], "pontuacao": P.cfg["pontuacao"]}})
         if p.startswith("/api/rodada/"):
             d = P.dir_de(p[len("/api/rodada/"):])
-            return self._json(leitura.detalhe(d)) if d else self._erro(404, "rodada não encontrada")
+            return self._json(leitura.detalhe(d)) if d else self._erro(404, "rodada nêo encontrada")
         if p.startswith("/api/log/"):
             j = P.fila.buscar(p[len("/api/log/"):])
             if not j:
-                return self._erro(404, "job não encontrado")
+                return self._erro(404, "job nêo encontrado")
             desde = int((q.get("desde") or ["0"])[0] or 0)
             texto, pos = j.texto_log(desde)
             return self._json({**j.dict(), "texto": texto, "pos": pos})
@@ -146,7 +146,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._erro(400, "caminho incompleto")
             d = P.dir_de(partes[2])
             if not d:
-                return self._erro(404, "rodada não encontrada")
+                return self._erro(404, "rodada nêo encontrada")
             alvo = (d / partes[3]).resolve()
             if d not in alvo.parents:
                 return self._erro(403, "fora da pasta da rodada")
@@ -171,25 +171,25 @@ class Handler(BaseHTTPRequestHandler):
             if u.path == "/api/refazer":
                 d = P.dir_de(corpo.get("id"))
                 if not d:
-                    return self._erro(404, "rodada não encontrada")
+                    return self._erro(404, "rodada nêo encontrada")
                 fase = corpo.get("fase", "selecionar")
                 cmd = P.fila.cmd_fase(fase, d.name, corpo.get("modo"), corpo.get("alvo"))
                 return self._json(P.fila.enfileirar(cmd, f"{fase} {d.name}", d.name).dict())
             if u.path == "/api/plano":
                 d = P.dir_de(corpo.get("id"))
                 if not d:
-                    return self._erro(404, "rodada não encontrada")
+                    return self._erro(404, "rodada nêo encontrada")
                 novo, avisos = salvar_plano(d, corpo)
                 resp = {"ok": True, "avisos": avisos, "total_s": novo["total_s"],
                         "segmentos": len(novo["segmentos"])}
-                # "salvar e renderizar" numa tacada: render não chama LLM, custa US$0
+                # "salvar e renderizar" numa tacada: render nêo chama LLM, custa US$0
                 if corpo.get("renderizar"):
                     cmd = P.fila.cmd_fase("render", d.name)
                     resp["job"] = P.fila.enfileirar(cmd, f"render {d.name}", d.name).dict()
                 return self._json(resp)
             if u.path == "/api/cancelar":
                 j = P.fila.cancelar(corpo.get("job"))
-                return self._json(j.dict()) if j else self._erro(404, "job não encontrado")
+                return self._json(j.dict()) if j else self._erro(404, "job nêo encontrado")
         except Invalido as e:
             return self._erro(400, str(e))
         except ValueError as e:

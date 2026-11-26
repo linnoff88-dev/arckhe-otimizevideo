@@ -15,8 +15,8 @@
   "max_tentativas": 2,
   "aceita_destino": true,
   "campos": {
-    "modo": { "tipo": "texto", "padrao": "A", "descricao": "A = fala original (padrão); B = sem apresentador, narração TTS; C = só demo/gráfico; N = vídeo inteiro com narração" },
-    "alvo": { "tipo": "texto", "padrao": "120", "descricao": "duração alvo do corte, em segundos" }
+    "modo": { "tipo": "texto", "padrao": "A", "descricao": "A = fala original (padrêo); B = sem apresentador, narraçêo TTS; C = só demo/gráfico; N = vídeo inteiro com narraçêo" },
+    "alvo": { "tipo": "texto", "padrao": "120", "descricao": "duraçêo alvo do corte, em segundos" }
   },
   "requer": {
     "bin": ["python3", "ffmpeg", "ffprobe", "yt-dlp"],

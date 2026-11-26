@@ -7,7 +7,7 @@ from otv.fases.transcrever import transcrever
 def test_normalizar_torna_monotonico():
     p = normalizar_palavras([{"t": "a", "ini": 0.0, "fim": 0.5}, {"t": "b", "ini": 0.4, "fim": 0.9},
                              {"t": "c", "ini": 1.85, "fim": 1.7}])
-    assert p[1]["ini"] == 0.5                 # não começa antes da anterior terminar
+    assert p[1]["ini"] == 0.5                 # nêo começa antes da anterior terminar
     assert p[2]["fim"] >= p[2]["ini"] + 0.05  # fim nunca antes do início
 
 def test_de_groq_contrato():

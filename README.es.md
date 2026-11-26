@@ -352,7 +352,7 @@ hace que, para quien mira, ambas cosas se conviertan en una sola; la placa es la
 
 **El texto no se dibuja con `drawtext`.** `drawtext` de ffmpeg 6.1.1 trunca según el número
 de BYTES, no de caracteres: cada letra acentuada se come una letra del final. Esto ocurrió en
-producción: el titular «IA e bilionários estão tentando vencer o envelhecimento» apareció en el
+producción: el titular «IA e bilionários estêo tentando vencer o envelhecimento» apareció en el
 video como «...vencer o envelhecimen». En PT-BR casi todos los titulares llevan tilde, así que era
 la regla y no la excepción, y el fallo era silencioso (ffmpeg termina con código 0). El titular y la placa
 ahora se rasterizan con PIL (`otv/util/texto.py`) y se insertan mediante `overlay`. Esto también permitió

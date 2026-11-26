@@ -16,8 +16,8 @@ def _preparar(tmp_path, video_teste, id_, plan):
 def _pixels_glifo(video, t, tmp_path, tag=""):
     """Conta pixels quase-brancos (>200 em escala de cinza) na faixa dos 16% superiores
     do quadro em t. Usado pra confirmar que o TEXTO da manchete realmente apareceu — o
-    drawbox sozinho escurece a faixa mesmo com o texto em branco (bug do '%'), então
-    contar glifo é o critério certo, não só brilho médio da faixa."""
+    drawbox sozinho escurece a faixa mesmo com o texto em branco (bug do '%'), entêo
+    contar glifo é o critério certo, nêo só brilho médio da faixa."""
     from PIL import Image
     frame = tmp_path / f"frame_{tag}_{t}.png"
     thumb(video, t, frame)
@@ -30,13 +30,13 @@ def _pixels_glifo(video, t, tmp_path, tag=""):
 def test_montar_filtro_dois_segmentos():
     f = montar_filtro([{"in": 1.0, "out": 3.0, "estender_s": 0}, {"in": 4.0, "out": 5.5, "estender_s": 0}])
     # Um input por segmento (índice = número do segmento), com o corte já feito por
-    # -ss/-t na entrada -- por isso o trim aqui é relativo (0:duração), não absoluto.
+    # -ss/-t na entrada -- por isso o trim aqui é relativo (0:duraçêo), nêo absoluto.
     # Ver a docstring de montar_filtro: com um input só, os quadros crus dos segmentos
-    # ainda não consumidos empilhavam nas filas do concat (60,9 GB / host travado).
+    # ainda nêo consumidos empilhavam nas filas do concat (60,9 GB / host travado).
     assert "[0:v]trim=0:2.0,setpts=PTS-STARTPTS[v0]" in f
     assert "[1:v]trim=0:1.5,setpts=PTS-STARTPTS[v1]" in f
     assert "[1:a]atrim=0:1.5" in f
-    # nota: a asserção do brief ("concat=...[v][a]") está desatualizada — o filtro
+    # nota: a asserçêo do brief ("concat=...[v][a]") está desatualizada — o filtro
     # concatena para os rótulos intermediários [vc][ac] e só depois deriva [a] (via
     # loudnorm) e [v] (via null, ou drawtext quando há manchete).
     assert "concat=n=2:v=1:a=1[vc][ac]" in f
@@ -65,10 +65,10 @@ def test_montar_filtro_manchete_vira_imagem_e_nao_drawtext(tmp_path):
     """O texto agora é rasterizado (PIL) e entra por overlay.
 
     Trocamos drawtext por imagem porque o drawtext do ffmpeg 6.1.1 trunca pelo número de
-    BYTES: cada caractere acentuado come uma letra do fim. Foi visto em produção — a
-    manchete "IA e bilionários estão tentando vencer o envelhecimento" saiu no output.mp4
+    BYTES: cada caractere acentuado come uma letra do fim. Foi visto em produçêo — a
+    manchete "IA e bilionários estêo tentando vencer o envelhecimento" saiu no output.mp4
     como "...vencer o envelhecimen". Com imagem, nenhum caractere depende do parser do
-    ffmpeg, então some junto a necessidade de escapar ':', "'", '\\' e '%'.
+    ffmpeg, entêo some junto a necessidade de escapar ':', "'", '\\' e '%'.
     """
     f = montar_filtro([{"in": 0.0, "out": 2.0, "estender_s": 0}], manchete="A:B's 100% \\ fim",
                       dir=tmp_path)
@@ -81,20 +81,20 @@ def test_montar_filtro_manchete_vira_imagem_e_nao_drawtext(tmp_path):
 
 
 def test_texto_acentuado_nao_perde_letra(tmp_path):
-    """Regressão do bug de bytes: o fim do texto tem que sobreviver ao acento."""
+    """Regressêo do bug de bytes: o fim do texto tem que sobreviver ao acento."""
     from otv.util.texto import desenhar, fonte, quebrar
     fnt = fonte(40)
-    # a última palavra precisa caber inteira numa linha só (sem quebra), pra a comparação
-    # medir truncamento e não quebra de linha
-    linhas = quebrar("IA e bilionários estão tentando vencer o envelhecimento", fnt, 4000)
-    assert linhas == ["IA e bilionários estão tentando vencer o envelhecimento"]
+    # a última palavra precisa caber inteira numa linha só (sem quebra), pra a comparaçêo
+    # medir truncamento e nêo quebra de linha
+    linhas = quebrar("IA e bilionários estêo tentando vencer o envelhecimento", fnt, 4000)
+    assert linhas == ["IA e bilionários estêo tentando vencer o envelhecimento"]
     png, alt = desenhar("bilionários envelhecimento", tmp_path / "t.png", 1280, tamanho_px=40)
     assert png.exists() and alt > 0
 
 
 def test_montar_filtro_sem_audio_original_muda_de_verdade():
-    # bug real: "volume=0dB" é ganho unitário (não muda nada); "volume=0" (fator linear
-    # zero) é que silencia. sem_audio_original=True tem que emitir o segundo, não o primeiro.
+    # bug real: "volume=0dB" é ganho unitário (nêo muda nada); "volume=0" (fator linear
+    # zero) é que silencia. sem_audio_original=True tem que emitir o segundo, nêo o primeiro.
     seg = [{"in": 0.0, "out": 2.0, "estender_s": 0}]
     com_cama = montar_filtro(seg, narracao=["a.wav"], sem_audio_original=False)
     mudo = montar_filtro(seg, narracao=["a.wav"], sem_audio_original=True)
@@ -112,21 +112,21 @@ def test_render_manchete_renderiza_de_verdade(video_teste, tmp_path):
     out = render(tmp_path, {"saida": str(tmp_path / "saida"), "cta": "", "fade_final_s": 0})
     assert abs(probe(out)["duracao_s"] - 5.5) < 0.15
 
-    # Achado 2 da rodada de correção 1: brilho médio da faixa não detecta manchete em
+    # Achado 2 da rodada de correçêo 1: brilho médio da faixa nêo detecta manchete em
     # branco, porque o drawbox continua desenhando (escurecendo o topo) mesmo sem
     # nenhum glifo. O critério certo é contar pixels quase-brancos (o texto em si), e
-    # afirmar que há uma quantidade significativa deles -- não comparar com t=5, porque
+    # afirmar que há uma quantidade significativa deles -- nêo comparar com t=5, porque
     # o fundo sintético (testsrc) já tem barras claras sem tarja nenhuma, o que tornaria
-    # essa comparação um falso positivo/negativo dependendo do padrão de fundo.
+    # essa comparaçêo um falso positivo/negativo dependendo do padrêo de fundo.
     glifo_com_tarja = _pixels_glifo(out, 1.0, tmp_path, "com")   # dentro dos 4s, texto tem que aparecer
     assert glifo_com_tarja > 200, f"poucos pixels de glifo em t=1 (tarja ativa): {glifo_com_tarja}"
     print(f"GLIFO_PIXELS t=1(com manchete): {glifo_com_tarja}")
 
 
 def test_render_manchete_com_porcentagem_nao_apaga_o_texto(video_teste, tmp_path):
-    # Regressão do Achado 1: manchete plausível em PT-BR vinda de LLM ("50% de desconto",
-    # "aumentou 30%") não pode sumir silenciosamente. Confirma que o glifo aparece de
-    # verdade (não só que o ffmpeg não falhou).
+    # Regressêo do Achado 1: manchete plausível em PT-BR vinda de LLM ("50% de desconto",
+    # "aumentou 30%") nêo pode sumir silenciosamente. Confirma que o glifo aparece de
+    # verdade (nêo só que o ffmpeg nêo falhou).
     _preparar(tmp_path, video_teste, "percentual", {
         "modo": "A", "alvo_s": 3, "total_s": 3.0, "narracao": None,
         "manchete": "100% de certeza de verdade",
@@ -149,18 +149,18 @@ def test_render_manchete_caracteres_perigosos_render_de_verdade(video_teste, tmp
     assert abs(probe(out)["duracao_s"] - 3.0) < 0.15
 
 
-# --- Achados 4 e 5 da rodada de correção 1 --------------------------------
+# --- Achados 4 e 5 da rodada de correçêo 1 --------------------------------
 
 def test_montar_filtro_narracao_tem_fade_out():
-    # Achado 1 da rodada de correção 1 da Task 10: a Task 10 já trunca o roteiro pelo
-    # orçamento de palavras antes do TTS, mas a duração real do wav não é perfeitamente
-    # previsível a partir da contagem de palavras -- este afade=t=out na trilha de narração
+    # Achado 1 da rodada de correçêo 1 da Task 10: a Task 10 já trunca o roteiro pelo
+    # orçamento de palavras antes do TTS, mas a duraçêo real do wav nêo é perfeitamente
+    # previsível a partir da contagem de palavras -- este afade=t=out na trilha de narraçêo
     # ([n{k}]) é a rede de segurança contra um corte abrupto no atrim=0:{d+ext}, com a
-    # mesma duração de 0.04s que a trilha original já usa.
+    # mesma duraçêo de 0.04s que a trilha original já usa.
     seg = [{"in": 0.0, "out": 2.0, "estender_s": 0.5}]
     f = montar_filtro(seg, narracao=["a.wav"])
     assert "afade=t=out:st=2.460:d=0.04[n0]" in f  # d+ext=2.5 -> st=2.5-0.04=2.46
-    # com 1 segmento, os inputs de vídeo ocupam o índice 0 e a narração começa no 1;
+    # com 1 segmento, os inputs de vídeo ocupam o índice 0 e a narraçêo começa no 1;
     # com 2 segmentos ela começa no 2 -- é esse deslocamento que render() tem que casar.
     f2 = montar_filtro([{"in": 0.0, "out": 2.0, "estender_s": 0},
                         {"in": 3.0, "out": 5.0, "estender_s": 0}], narracao=["a.wav", "b.wav"])
@@ -182,8 +182,8 @@ def test_render_narracao_com_null_falha_com_mensagem_clara(video_teste, tmp_path
 
 def test_render_rapido_produz_mp4_legivel(video_teste, tmp_path):
     # Achado 5: --rapido (concat demuxer + -c copy) sem cobertura nenhuma. Smoke test
-    # barato -- NÃO afirma duração exata: esse caminho corta em keyframe e é aproximado
-    # de propósito (pode variar por até um GOP inteiro), afirmar duração exata criaria
+    # barato -- NêO afirma duraçêo exata: esse caminho corta em keyframe e é aproximado
+    # de propósito (pode variar por até um GOP inteiro), afirmar duraçêo exata criaria
     # um teste frágil.
     _preparar(tmp_path, video_teste, "rapido", {
         "modo": "A", "alvo_s": 3, "total_s": 3.0, "narracao": None,
@@ -195,10 +195,10 @@ def test_render_rapido_produz_mp4_legivel(video_teste, tmp_path):
     assert d > 0
 
 
-# --- regressão do travamento do host (2026-08-27) --------------------------
+# --- regressêo do travamento do host (2026-08-27) --------------------------
 
 def test_render_nao_bufferiza_video_inteiro(video_teste, tmp_path):
-    """Segmentos esparsos ao longo do fonte não podem custar o vídeo inteiro em RAM.
+    """Segmentos esparsos ao longo do fonte nêo podem custar o vídeo inteiro em RAM.
 
     O bug: com `[0:v]trim` N vezes sobre um input único, o ffmpeg decodifica linearmente
     e empilha os quadros crus dos segmentos 1..N-1 nas filas do concat enquanto ele
@@ -211,7 +211,7 @@ def test_render_nao_bufferiza_video_inteiro(video_teste, tmp_path):
                           {"in": 5.0, "out": 6.0, "unidades": [1], "estender_s": 0}]}
     _preparar(tmp_path, video_teste, "esparso", plan)
     f = montar_filtro(plan["segmentos"])
-    assert "[1:v]" in f, "segundo segmento tem que vir de um input próprio, não de [0:v]"
+    assert "[1:v]" in f, "segundo segmento tem que vir de um input próprio, nêo de [0:v]"
     assert "trim=0:" in f and "trim=5.0" not in f, "trim tem que ser relativo ao input já seekado"
     out = render(tmp_path, {"saida": str(tmp_path / "saida"), "cta": "", "fade_final_s": 0})
     # e o corte esparso continua correto: 1s do início + 1s a partir dos 5s = 2s
@@ -221,7 +221,7 @@ def test_render_nao_bufferiza_video_inteiro(video_teste, tmp_path):
 def test_run_ffmpeg_tem_teto_de_memoria():
     """Cinto de segurança: o ffmpeg roda dentro de um scope com MemoryMax quando dá.
 
-    Fail-open de propósito (sem systemd-run, roda sem teto), então o teste aceita as duas
+    Fail-open de propósito (sem systemd-run, roda sem teto), entêo o teste aceita as duas
     saídas -- o que ele guarda é que, quando o prefixo existe, ele carrega o MemoryMax.
     """
     from otv.util.ffmpeg import _prefixo_scope, MEMMAX
@@ -232,7 +232,7 @@ def test_run_ffmpeg_tem_teto_de_memoria():
         assert pref == []
 
 
-# --- Task 10b: modo A+ (segmento talking_head trocado por ilustração) ------
+# --- Task 10b: modo A+ (segmento talking_head trocado por ilustraçêo) ------
 
 def _png_solido(path, cor="red", w=320, h=180):
     from otv.util.ffmpeg import run
@@ -249,14 +249,14 @@ def test_montar_filtro_substituir_usa_movie_e_mantem_audio_original(tmp_path):
     f = montar_filtro(segs, dir=tmp_path, tamanho=(1920, 1080, 25))
     assert f"movie={tmp_path / 'subst/seg_00.png'}" in f
     assert "zoompan=" in f and "d=50:" in f          # 2.0s * 25fps
-    assert "[0:v]trim=" not in f                      # o vídeo original do seg 0 não é usado
+    assert "[0:v]trim=" not in f                      # o vídeo original do seg 0 nêo é usado
     assert "[0:a]atrim=0:2.0" in f                    # ...mas o áudio dele, sim
-    assert "[1:v]trim=0:2.0" in f                     # segmento não-substituído segue igual
+    assert "[1:v]trim=0:2.0" in f                     # segmento nêo-substituído segue igual
 
 
 def test_montar_filtro_substituir_absorve_a_extensao_sem_tpad(tmp_path):
-    # zoompan gera d=N quadros a partir de uma imagem só, então ele já cobre d+ext --
-    # tpad (que clona o último quadro de um vídeo) não faz sentido aqui.
+    # zoompan gera d=N quadros a partir de uma imagem só, entêo ele já cobre d+ext --
+    # tpad (que clona o último quadro de um vídeo) nêo faz sentido aqui.
     f = montar_filtro([{"in": 0.0, "out": 2.0, "estender_s": 1.0, "substituir": "s.png"}],
                       dir=tmp_path, tamanho=(1920, 1080, 25))
     assert "d=75:" in f and "tpad=" not in f          # (2.0+1.0)*25
@@ -273,18 +273,18 @@ def test_render_substituir_troca_o_video_e_preserva_duracao(video_teste, tmp_pat
     out = render(tmp_path, {"saida": str(tmp_path / "saida"), "cta": "", "fade_final_s": 0})
     assert abs(probe(out)["duracao_s"] - 3.0) < 0.15
     # em t=0.7 (dentro do segmento substituído) o quadro tem que ser vermelho chapado,
-    # não o testsrc colorido da fixture
+    # nêo o testsrc colorido da fixture
     from PIL import Image
     frame = tmp_path / "f_subst.png"; thumb(out, 0.7, frame)
     r, g, b = Image.open(frame).convert("RGB").resize((1, 1)).getpixel((0, 0))
-    assert r > 150 and g < 80 and b < 80, f"segmento não foi substituído pela imagem: RGB={(r, g, b)}"
+    assert r > 150 and g < 80 and b < 80, f"segmento nêo foi substituído pela imagem: RGB={(r, g, b)}"
 
 
-# --- bloco 1: mudo por padrão, fade de saída e CTA colado no fim -----------
+# --- bloco 1: mudo por padrêo, fade de saída e CTA colado no fim -----------
 
 def test_montar_filtro_muda_o_original_por_padrao_quando_ha_narracao():
-    # -18 dB de FALA continua inteligível e briga com a narração (dois idiomas no mesmo
-    # canal). A cama a -18 dB só faz sentido pra música/ambiência, então virou opt-in.
+    # -18 dB de FALA continua inteligível e briga com a narraçêo (dois idiomas no mesmo
+    # canal). A cama a -18 dB só faz sentido pra música/ambiência, entêo virou opt-in.
     f = montar_filtro([{"in": 0.0, "out": 2.0, "estender_s": 0}], narracao=["a.wav"])
     assert "volume=0[o0]" in f and "-18dB" not in f
     com_cama = montar_filtro([{"in": 0.0, "out": 2.0, "estender_s": 0}], narracao=["a.wav"],
@@ -293,7 +293,7 @@ def test_montar_filtro_muda_o_original_por_padrao_quando_ha_narracao():
 
 
 def test_montar_filtro_fade_de_saida_no_fim_do_corpo():
-    # 2.0s + 1.0s de extensão = 3.0s de corpo; o fade de 0.8s começa em 2.2s
+    # 2.0s + 1.0s de extensêo = 3.0s de corpo; o fade de 0.8s começa em 2.2s
     f = montar_filtro([{"in": 0.0, "out": 2.0, "estender_s": 1.0}], fade_s=0.8)
     assert "fade=t=out:st=2.200:d=0.8[v]" in f
     assert "afade=t=out:st=2.200:d=0.8[a]" in f
@@ -343,7 +343,7 @@ def test_costurar_recusa_parte_sem_audio(tmp_path, video_teste):
     mudo = tmp_path / "mudo.mp4"
     _run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", "color=c=red:s=320x240:r=25",
           "-t", "1", "-c:v", "libx264", str(mudo)])
-    with pytest.raises(RuntimeError, match="não tem trilha de áudio"):
+    with pytest.raises(RuntimeError, match="nêo tem trilha de áudio"):
         costurar([video_teste, mudo], tmp_path / "out.mp4", (320, 240, 25))
 
 
@@ -358,9 +358,9 @@ def test_costurar_junta_tres_partes(video_teste, tmp_path):
 def test_congelamento_nao_fica_100_por_cento_estatico(video_teste, tmp_path):
     """O tpad clona o último quadro; quadro parado por segundos parece player travado.
 
-    O zoom tem que ser GRADUAL — por isso a comparação é início→meio→fim, e não só
+    O zoom tem que ser GRADUAL — por isso a comparaçêo é início→meio→fim, e nêo só
     início→fim: um filtro que aplicasse zoom fixo ao segmento inteiro também passaria numa
-    checagem de "os extremos são diferentes".
+    checagem de "os extremos sêo diferentes".
     """
     import statistics
     from PIL import Image, ImageChops
@@ -368,7 +368,7 @@ def test_congelamento_nao_fica_100_por_cento_estatico(video_teste, tmp_path):
         "modo": "A", "alvo_s": 5, "total_s": 5.0, "narracao": None, "manchete": None,
         "segmentos": [{"in": 0.0, "out": 2.0, "unidades": [0], "estender_s": 3.0}]})
     out = render(tmp_path, {"saida": str(tmp_path / "saida"), "cta": "", "fade_final_s": 0})
-    assert abs(probe(out)["duracao_s"] - 5.0) < 0.15    # o zoom não pode mudar a duração
+    assert abs(probe(out)["duracao_s"] - 5.0) < 0.15    # o zoom nêo pode mudar a duraçêo
 
     def quadro(t, nome):
         p = tmp_path / f"{nome}.png"
@@ -381,11 +381,11 @@ def test_congelamento_nao_fica_100_por_cento_estatico(video_teste, tmp_path):
     ini, meio, fim = quadro(2.1, "ini"), quadro(3.5, "meio"), quadro(4.9, "fim")
     d_meio, d_fim = dif(ini, meio), dif(ini, fim)
     assert d_meio > 1.0, f"congelamento parado no meio (diferença {d_meio:.2f})"
-    assert d_fim > d_meio, f"zoom não é progressivo (meio {d_meio:.2f}, fim {d_fim:.2f})"
+    assert d_fim > d_meio, f"zoom nêo é progressivo (meio {d_meio:.2f}, fim {d_fim:.2f})"
 
 
 def test_congelamento_curto_nao_ganha_zoom():
-    """Abaixo de 0,15s o zoom não teria tempo de aparecer e só custaria reencode."""
+    """Abaixo de 0,15s o zoom nêo teria tempo de aparecer e só custaria reencode."""
     f = montar_filtro([{"in": 0.0, "out": 2.0, "estender_s": 0.1}], tamanho=(640, 360, 25))
     assert "tpad=stop_mode=clone" in f and "zoompan" not in f
 

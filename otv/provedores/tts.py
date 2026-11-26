@@ -7,16 +7,16 @@ from otv.util.ffmpeg import run
 # (ver task-10-report.md pro detalhe). CAMPO_ID="id" e "completed" em STATUS_OK bateram com
 # o brief. UMA divergência: GET /api/jobs/{id}/download devolve 404 — quem entrega o áudio
 # de verdade é GET /api/jobs/{id}/audio (200, audio/wav). Por isso ENDPOINT_AUDIO="audio",
-# não "download".
+# nêo "download".
 INEMAVOX = "http://localhost:8010"; CAMPO_ID = "id"; STATUS_OK = {"completed", "done", "finished"}; STATUS_ERRO = {"failed", "error"}
 ENDPOINT_AUDIO = "audio"
 STATUS_EM_ANDAMENTO = {"queued", "running", "pending", "processing"}
-# Achado 2 (rodada de correção 1): um status fora de STATUS_OK ∪ STATUS_ERRO ∪
+# Achado 2 (rodada de correçêo 1): um status fora de STATUS_OK ∪ STATUS_ERRO ∪
 # STATUS_EM_ANDAMENTO (ex.: "cancelled", "crashed", campo ausente) hoje só derruba no
-# timeout de 600×2s (~20min) — desperdício operacional real, mesmo não sendo um hang
+# timeout de 600×2s (~20min) — desperdício operacional real, mesmo nêo sendo um hang
 # infinito. Se o MESMO status desconhecido se repetir N_DESCONHECIDO vezes seguidas,
 # desiste rápido com o status observado na mensagem.
-N_DESCONHECIDO = 15  # ~30s (intervalo de poll de 2s) antes de desistir de um status não reconhecido
+N_DESCONHECIDO = 15  # ~30s (intervalo de poll de 2s) antes de desistir de um status nêo reconhecido
 
 def tts_inemavox(texto, out, voz="pt-BR-FranciscaNeural", engine="edge"):
     r = requests.post(f"{INEMAVOX}/api/jobs/tts", json={"text": texto, "engine": engine, "voice": voz, "lang": "pt"}, timeout=60)
@@ -58,5 +58,5 @@ def tts(texto, out, cfg, provedor=None):
     if p == "elevenlabs":
         return tts_elevenlabs(texto, out, cfg.get("voz_elevenlabs"))
     # a voz e a engine saem do config.yaml (`voz:` / `tts_engine:`) em vez de ficarem
-    # presas no default da função: é a única coisa que o usuário troca com frequência.
+    # presas no default da funçêo: é a única coisa que o usuário troca com frequência.
     return tts_inemavox(texto, out, cfg.get("voz", "pt-BR-FranciscaNeural"), cfg.get("tts_engine", "edge"))

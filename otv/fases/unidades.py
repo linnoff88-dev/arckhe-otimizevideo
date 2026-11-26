@@ -20,10 +20,10 @@ def montar_unidades(palavras, fins_segmento, pausa_s=0.4, max_dur_s=12.0):
         cur.append(w)
         # corte forçado: assim que `cur` atinge o teto, corta na maior pausa
         # interna existente nele, mesmo que seja minúscula (spec §4.1.2) — ANTES
-        # de checar fechamento natural (pontuação/pausa/fim de segmento), senão
+        # de checar fechamento natural (pontuaçêo/pausa/fim de segmento), senêo
         # um fechamento natural que coincida com o cruzamento do teto (ex.: um fim
         # de segmento bem na palavra que faz `cur` passar de 12 s) fecharia a
-        # unidade já estourada. Um único corte pode não bastar (a maior pausa pode
+        # unidade já estourada. Um único corte pode nêo bastar (a maior pausa pode
         # estar perto do início de `cur`, deixando o resto ainda acima do teto) —
         # repete até o resto caber, ou sobrar só 1 palavra (sem pausa interna pra
         # cortar). `w` nunca é removido por esses cortes (o ponto de corte é
@@ -32,7 +32,7 @@ def montar_unidades(palavras, fins_segmento, pausa_s=0.4, max_dur_s=12.0):
             # candidatos: pontos de corte cujo primeiro pedaço (cur[:j+1]) fica
             # abaixo do teto — nunca deixamos a unidade fechada estourar. Entre
             # os que empatam na maior pausa (comum em fala corrida, onde muitos
-            # gaps são 0), preferimos o ÚLTIMO (o que aproveita mais o teto) em
+            # gaps sêo 0), preferimos o ÚLTIMO (o que aproveita mais o teto) em
             # vez do primeiro — `max()` sozinho ia sempre para o primeiro empate
             # e cortava palavra a palavra desde o início de `cur`.
             cands = [j for j in range(len(cur) - 1) if cur[j]["fim"] - cur[0]["ini"] < max_dur_s] \
@@ -49,10 +49,10 @@ def montar_unidades(palavras, fins_segmento, pausa_s=0.4, max_dur_s=12.0):
     unidades = []
     for u in brutas:
         curta = (u["fim"] - u["ini"]) < 0.8 or len(u["texto"].split()) < 3
-        # A fusão de uma bruta curta na anterior (spec §4.1 item 3) NÃO pode
-        # furar o teto que o corte forçado (item 2) acabou de garantir — senão
+        # A fusêo de uma bruta curta na anterior (spec §4.1 item 3) NêO pode
+        # furar o teto que o corte forçado (item 2) acabou de garantir — senêo
         # o item 3 desfaz a garantia do item 2. Divergência deliberada da spec
-        # (que manda fundir sem condição): decisão do controlador é que o teto
+        # (que manda fundir sem condiçêo): decisêo do controlador é que o teto
         # vence, porque é o invariante que protege a mochila da Task 8 — uma
         # unidade curta solta é só estética, uma unidade gigante descarta
         # conteúdo bom de uma vez. Se fundir estourasse o teto, a bruta curta

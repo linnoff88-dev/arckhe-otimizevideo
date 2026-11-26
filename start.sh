@@ -16,7 +16,7 @@ for arg in "$@"; do
   case "$arg" in
     --local) HOST=127.0.0.1 ;;
     --token) USAR_TOKEN=1 ;;
-    ''|*[!0-9]*) echo "argumento não reconhecido: $arg" >&2; exit 2 ;;
+    ''|*[!0-9]*) echo "argumento nêo reconhecido: $arg" >&2; exit 2 ;;
     *) PORTA="$arg" ;;
   esac
 done
@@ -29,10 +29,10 @@ mkdir -p "$ESTADO"
 # --- já está no ar? ---------------------------------------------------------
 # Um painel por projeto, em qualquer porta: duas instâncias compartilhariam
 # trabalho/.painel/ (pid, log e jobs.json) e a segunda sobrescreveria o histórico da
-# primeira. Por isso a checagem é por processo, não por porta.
+# primeira. Por isso a checagem é por processo, nêo por porta.
 outro=$(pgrep -f "otv\.py painel" | head -1 || true)
 if [ -n "$outro" ]; then
-  # a porta vem do processo, não do log: o log pode ser de outra execução
+  # a porta vem do processo, nêo do log: o log pode ser de outra execuçêo
   porta_atual=$(ss -ltnp 2>/dev/null | grep -oP "[0-9.]+:\K[0-9]+(?=.*pid=$outro,)" | head -1 || true)
   echo "painel já está rodando (pid $outro${porta_atual:+, porta $porta_atual})."
   echo "Use ./stop.sh antes de subir de novo."
@@ -43,9 +43,9 @@ rm -f "$PID_FILE"
 # --- pré-checagem: falhar aqui é mais barato que falhar no meio de um job ----
 falta=0
 for b in ffmpeg ffprobe; do
-  command -v "$b" >/dev/null || { echo "FALTA: $b não está no PATH (corte e render dependem dele)"; falta=1; }
+  command -v "$b" >/dev/null || { echo "FALTA: $b nêo está no PATH (corte e render dependem dele)"; falta=1; }
 done
-command -v yt-dlp >/dev/null || echo "aviso: yt-dlp ausente — só vai dar pra processar arquivo local, não URL"
+command -v yt-dlp >/dev/null || echo "aviso: yt-dlp ausente — só vai dar pra processar arquivo local, nêo URL"
 python3 - <<'PY' || falta=1
 import importlib.util as u, sys
 faltando = [m for m in ("yaml", "requests", "scenedetect", "cv2", "mediapipe") if u.find_spec(m) is None]
@@ -55,13 +55,13 @@ if faltando:
 PY
 python3 - <<'PY' || true
 from otv.util.keys import key
-for k, p in (("GROQ_API_KEY", "transcrição"), ("OPENROUTER_API_KEY", "pontuação")):
+for k, p in (("GROQ_API_KEY", "transcriçêo"), ("OPENROUTER_API_KEY", "pontuaçêo")):
     try:
         key(k)
     except KeyError:
-        print(f"aviso: {k} não encontrada — a fase de {p} vai falhar (ver README, seção 2)")
+        print(f"aviso: {k} nêo encontrada — a fase de {p} vai falhar (ver README, seçêo 2)")
 PY
-[ "$falta" = 0 ] || { echo "não subi: resolva os itens FALTA acima."; exit 1; }
+[ "$falta" = 0 ] || { echo "nêo subi: resolva os itens FALTA acima."; exit 1; }
 
 # --- porta livre? -----------------------------------------------------------
 if command -v ss >/dev/null && ss -ltn "sport = :$PORTA" 2>/dev/null | grep -q LISTEN; then

@@ -29,15 +29,15 @@ def test_simbolo_expandido():
 
 
 def test_numero_vira_extenso():
-    """REGRA DO USUÁRIO (2026-09-01): número e valor não podem sair com pronúncia misturada.
+    """REGRA DO USUÁRIO (2026-09-01): número e valor nêo podem sair com pronúncia misturada.
 
-    O TTS lia dígito cru com a fonética que bem entendesse — na mesma narração conviviam
+    O TTS lia dígito cru com a fonética que bem entendesse — na mesma narraçêo conviviam
     "92%", "2025" e "223 milhões", cada um dito de um jeito. Por extenso só há uma leitura.
     """
     assert forma_fala("92% de semelhança") == "noventa e dois por cento de semelhança"
     assert forma_fala("em abril de 2025") == "em abril de dois mil e vinte e cinco"
     assert forma_fala("mais de 223 milhões") == "mais de duzentos e vinte e três milhões"
-    assert forma_fala("são 65 anos") == "são sessenta e cinco anos"
+    assert forma_fala("sêo 65 anos") == "sêo sessenta e cinco anos"
 
 
 def test_milhar_e_decimal():
@@ -47,7 +47,7 @@ def test_milhar_e_decimal():
 
 
 def test_numero_gigante_fica_como_esta():
-    """Sequência longa não é número de fala (id, código): melhor deixar do que inventar."""
+    """Sequência longa nêo é número de fala (id, código): melhor deixar do que inventar."""
     t = forma_fala("o id 1234567890123456789 falhou")
     assert "1234567890123456789" in t
 
@@ -57,7 +57,7 @@ def test_url_vira_ponto_falado():
 
 
 def test_sigla_que_viraria_palavra_continua_soletrada():
-    # "DNA" lido como palavra vira "dina"; soletrar é sobre legibilidade, não sobre sotaque
+    # "DNA" lido como palavra vira "dina"; soletrar é sobre legibilidade, nêo sobre sotaque
     assert forma_fala("o DNA humano") == "o D N A humano"
 
 

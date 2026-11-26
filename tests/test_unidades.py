@@ -3,7 +3,7 @@ from otv.fases.unidades import montar_unidades, atribuir_cenas
 def P(t, ini, fim): return {"t": t, "ini": ini, "fim": fim}
 
 def test_quebra_em_pontuacao_e_pausa():
-    pal = [P("Oi", 0, .3), P("tudo", .35, .6), P("bem.", .65, .9),                    # frase 1 (pontuação)
+    pal = [P("Oi", 0, .3), P("tudo", .35, .6), P("bem.", .65, .9),                    # frase 1 (pontuaçêo)
            P("Sim", 1.5, 1.8), P("claro", 1.85, 2.2), P("que", 2.25, 2.5), P("sim", 2.55, 2.9),  # frase 2 (pausa de 0.6 depois)
            P("vamos", 3.5, 3.8), P("lá", 3.85, 4.1), P("agora", 4.15, 4.5)]
     u = montar_unidades(pal, [], pausa_s=0.4)
@@ -16,17 +16,17 @@ def test_funde_unidade_curta_na_anterior():
     assert len(u) == 1 and u[0]["texto"] == "Primeira frase. Ok." and u[0]["fim"] == 1.3
 
 def test_fecha_por_fim_de_segmento():
-    pal = [P(f"p{i}", i * 1.0, i * 1.0 + 0.7) for i in range(15)]  # 15 s sem pontuação, pausas iguais de 0.3
-    pal[7]["fim"] = 7.55                                              # marcado em fins_segmento — fecha ali, não por pausa/teto
+    pal = [P(f"p{i}", i * 1.0, i * 1.0 + 0.7) for i in range(15)]  # 15 s sem pontuaçêo, pausas iguais de 0.3
+    pal[7]["fim"] = 7.55                                              # marcado em fins_segmento — fecha ali, nêo por pausa/teto
     u = montar_unidades(pal, fins_segmento=[7.55], pausa_s=0.6)
     assert len(u) == 2 and u[0]["texto"].endswith("p7")
 
 def test_corta_na_maior_pausa_interna_ao_atingir_teto():
-    # 40 palavras contínuas (0.3 s cada), sem pontuação, sem fins_segmento, pausas de
+    # 40 palavras contínuas (0.3 s cada), sem pontuaçêo, sem fins_segmento, pausas de
     # 0.02 s em toda parte — nenhuma dispara pausa_s (0.4) — exceto uma de 0.09 s após
     # a palavra 20 (ainda abaixo de pausa_s). O trecho cruza o teto de 12 s por volta da
     # palavra ~37; o corte forçado tem que cair exatamente na maior pausa interna (0.09 s,
-    # após w20), não esperar um limiar fixo, e nenhuma unidade resultante pode passar de 12 s.
+    # após w20), nêo esperar um limiar fixo, e nenhuma unidade resultante pode passar de 12 s.
     pal = []; t = 0.0
     for i in range(40):
         ini = t; fim = round(ini + 0.3, 3)
@@ -39,7 +39,7 @@ def test_corta_na_maior_pausa_interna_ao_atingir_teto():
 
 def test_fusao_curta_nao_ultrapassa_teto():
     # caso adversarial (Achado da rodada 2): uma unidade grande perto do teto
-    # (11.5 s, fecha por pontuação) seguida de uma bruta curta ("ok tá.", 2
+    # (11.5 s, fecha por pontuaçêo) seguida de uma bruta curta ("ok tá.", 2
     # palavras) que, se fundida sem checar o teto (spec §4.1 item 3 ao pé da
     # letra), estouraria pra 12.1 s. O teto do item 2 tem que vencer: a bruta
     # curta fica como unidade própria em vez de fundir.

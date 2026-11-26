@@ -1,7 +1,7 @@
 """Modo A+ (`--substituir gerado`, Task 10b): troca os trechos de apresentador por
-ilustração gerada, mantendo o áudio original.
+ilustraçêo gerada, mantendo o áudio original.
 
-Só o VÍDEO é substituído — `[0:a]atrim` continua vindo do arquivo original, então a
+Só o VÍDEO é substituído — `[0:a]atrim` continua vindo do arquivo original, entêo a
 fala segue exatamente a mesma. A fase só marca `segmento["substituir"]` no plan.json;
 quem monta o filtro é o render.
 """
@@ -11,13 +11,13 @@ from otv.provedores.imagem import criar_imagem
 from otv.util.custos import registrar
 
 # "no text/no words/no letters": o flux escreve letreiro garrancho se deixar. "no person
-# speaking to camera": a primeira rodada (2026-08-27) montava o prompt a partir da DESCRIÇÃO
+# speaking to camera": a primeira rodada (2026-08-27) montava o prompt a partir da DESCRIÇêO
 # da cena -- que descreve justamente o apresentador -- e gerava outro apresentador, ou seja,
 # substituía talking head por talking head. O assunto tem que vir do que está sendo DITO.
-# Negação não funciona: "no people" no prompt positivo do flux é ignorado -- ele desenhava um
-# rosto sempre que a fala citava alguém (Bezos, Altman, "o cientista"), e a substituição só
-# trocava um rosto por outro. O que funciona é dizer o que DEVE aparecer, então o prompt vira
-# uma diretiva de natureza-morta conceitual, com o assunto entrando como TEMA e não como cena.
+# Negaçêo nêo funciona: "no people" no prompt positivo do flux é ignorado -- ele desenhava um
+# rosto sempre que a fala citava alguém (Bezos, Altman, "o cientista"), e a substituiçêo só
+# trocava um rosto por outro. O que funciona é dizer o que DEVE aparecer, entêo o prompt vira
+# uma diretiva de natureza-morta conceitual, com o assunto entrando como TEMA e nêo como cena.
 PREFIXO_PROMPT = ("Conceptual editorial illustration, dark cinematic still life. "
                   "Depict only objects, environments and abstract forms — laboratory glassware, "
                   "molecular structures, machinery, instruments, landscapes, geometry. "
@@ -41,7 +41,7 @@ def _topico_de(notas, unidades_ids):
 
 
 def montar_prompt(texto, topico, descricao=None):
-    """Prompt da ilustração: o ASSUNTO vem da fala do segmento (`texto`) e do tópico.
+    """Prompt da ilustraçêo: o ASSUNTO vem da fala do segmento (`texto`) e do tópico.
 
     A `descricao` da cena entra só como último recurso (segmento sem texto): num trecho
     talking_head ela descreve o apresentador, e usar isso como prompt gera outro
@@ -64,7 +64,7 @@ def substituir(dir, cfg, provedor=None, gerador=None, forcar=False):
     alvos = [k for k, s in enumerate(plan["segmentos"]) if s.get("visual") == "talking_head"]
     if not alvos:
         raise RuntimeError("nenhum segmento com visual 'talking_head' no plan.json — "
-                           "nada a substituir (rode 'otv cenas --classificar' se o visual não foi classificado)")
+                           "nada a substituir (rode 'otv cenas --classificar' se o visual nêo foi classificado)")
     gerador = gerador or criar_imagem(cfg, provedor)
     t0 = time.time(); gerados = 0
     for k in alvos:

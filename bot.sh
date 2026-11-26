@@ -10,7 +10,7 @@
 # Por que existe: `otv run` imprime `[render] <path>` e depois o status do plano,
 # e nenhuma dessas linhas é um caminho puro. Este script só traduz.
 #
-# O PATH ganha ~/.local/bin porque o serviço do bot roda sob systemd, que não o
+# O PATH ganha ~/.local/bin porque o serviço do bot roda sob systemd, que nêo o
 # herda — e é lá que o `yt-dlp` do pip mora.
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")"
@@ -41,5 +41,5 @@ except Exception:
 print(Path(cfg["saida"]).expanduser() / vid / "output.mp4")
 PY
 )"
-[ -s "$SAIDA" ] || { echo "render terminou mas o MP4 não está em $SAIDA" >&2; exit 1; }
+[ -s "$SAIDA" ] || { echo "render terminou mas o MP4 nêo está em $SAIDA" >&2; exit 1; }
 echo "$SAIDA"

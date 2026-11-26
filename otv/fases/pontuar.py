@@ -5,11 +5,11 @@ from otv.contratos import validar_notas
 from otv.util.custos import registrar
 
 MODOS = {"A": "condensado com a fala original: priorize o que se entende só ouvindo.",
-         "B": "sem o apresentador: a narração será refeita; priorize unidades cujo tipo de imagem é demo_tela, grafico ou slide, pois é a imagem que vai ficar.",
+         "B": "sem o apresentador: a narraçêo será refeita; priorize unidades cujo tipo de imagem é demo_tela, grafico ou slide, pois é a imagem que vai ficar.",
          "C": "só demonstrações e gráficos: priorize demo_tela e grafico.",
-         "N": ("narração refeita por cima do vídeo inteiro: a fala original será substituída, então "
+         "N": ("narraçêo refeita por cima do vídeo inteiro: a fala original será substituída, entêo "
                "priorize o que é importante pelo CONTEÚDO, sem se importar se a frase se sustenta sozinha "
-               "no áudio — a narração vai costurar as pontas.")}
+               "no áudio — a narraçêo vai costurar as pontas.")}
 
 def montar_lista(unidades):
     return "\n".join(f"[{u['id']:03d}] {u['dur']:.1f}s {u.get('visual', 'outro')} \"{u['texto']}\"" for u in unidades)
@@ -22,7 +22,7 @@ def montar_prompt(unidades, modo, alvo_s, titulo, duracao_s):
 def pontuar(dir, cfg, modo="A", alvo_s=None, provedor=None, forcar=False):
     dir = Path(dir); out = dir / "notas.json"
     if out.exists() and not forcar:
-        # o prompt de pontuação MUDA com o modo (MODOS[modo] entra no template), então
+        # o prompt de pontuaçêo MUDA com o modo (MODOS[modo] entra no template), entêo
         # reaproveitar notas de outro modo é validar o modo B com julgamento de modo A.
         # Só pula quando o modo bate; notas antigas sem o campo contam como "A" (era o
         # único modo que existia quando elas foram escritas).

@@ -4,8 +4,8 @@ from otv.contratos import validar_plan
 from otv.util.custos import registrar
 
 # None = sem filtro de imagem (escolhe em todo o vídeo). O modo N narra por cima do
-# conteúdo inteiro, então ele filtra tão pouco quanto o A — o que muda no N é o áudio,
-# não a seleção.
+# conteúdo inteiro, entêo ele filtra têo pouco quanto o A — o que muda no N é o áudio,
+# nêo a seleçêo.
 VISUAL_MODO = {"A": None, "N": None, "B": {"demo_tela", "grafico", "slide"}, "C": {"demo_tela", "grafico"}}
 
 def filtrar_modo(unidades, modo):
@@ -81,13 +81,13 @@ def selecionar_plan(unidades, notas, cenas, sel, modo, alvo_s):
     esc, total, por_topico = set(), 0.0, {}
     ancorar(notas.get("gancho", [])); ancorar(notas.get("fecho", []))
     # 2. mochila por nota (desempate: mais curta) — âncoras ficam fora da cota por tópico.
-    # Teto aqui é `alvo_s` puro (não `teto`, que já inclui a tolerância) — a folga de
-    # tolerância fica reservada para coesão/sanduíche/completar (passos 3, 4 e 6), que
-    # continuam podendo ir até `teto`. Ver Achado 2 da revisão da Task 8: com a mochila
-    # saturando o `teto` cheio, a coesão nunca tinha orçamento sobrando para agir.
+    # Teto aqui é `alvo_s` puro (nêo `teto`, que já inclui a tolerância) — a folga de
+    # tolerância fica reservada para coesêo/sanduíche/completar (passos 3, 4 e 6), que
+    # continuam podendo ir até `teto`. Ver Achado 2 da revisêo da Task 8: com a mochila
+    # saturando o `teto` cheio, a coesêo nunca tinha orçamento sobrando para agir.
     cands = sorted([u for u in elegiveis if u["nota"] >= nmin], key=lambda u: (-u["nota"], u["dur"]))
     esc, total, por_topico = mochila(cands, alvo_s, cota, topico_de, esc, total, por_topico)
-    # 3. coesão: estende cada segmento pros vizinhos razoáveis até min_segmento_ideal_s
+    # 3. coesêo: estende cada segmento pros vizinhos razoáveis até min_segmento_ideal_s
     for s in segmentar(esc, unidades):
         ids = list(s["unidades"])
         while _dur(ids) < sel["min_segmento_ideal_s"]:

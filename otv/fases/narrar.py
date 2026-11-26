@@ -8,14 +8,14 @@ from otv.util.custos import registrar
 
 PPM = 2.5       # palavras por segundo (~150 ppm)
 MAX_FREEZE = 3.0  # teto de freeze em segundos — mesmo valor usado por ajustar_extensao()
-# No modo N a narração cobre o vídeo inteiro e é uma reescrita da MESMA fala, então ela
+# No modo N a narraçêo cobre o vídeo inteiro e é uma reescrita da MESMA fala, entêo ela
 # tende a ficar mais longa que o trecho (português é mais prolixo que inglês). O usuário
 # pediu explicitamente que o clipe pare e espere a fala terminar — por isso o teto de
 # freeze é maior aqui: prefere-se congelar o quadro a truncar a frase.
 MAX_FREEZE_N = 6.0
 # Silêncio tolerado no fim de um segmento antes de encolher o vídeo (ver encolher_por_fala).
 FOLGA_FIM = 0.6      # respiro que fica DEPOIS da última palavra
-LIMIAR_SOBRA = 1.5   # abaixo disso a sobra é respiro, não buraco
+LIMIAR_SOBRA = 1.5   # abaixo disso a sobra é respiro, nêo buraco
 PROMPTS = {"N": "prompts/narrar_n.md"}   # os outros modos usam prompts/narrar.md
 
 def duracao_wav(p):
@@ -27,14 +27,14 @@ def ajustar_extensao(segmentos, duracoes, max_freeze=MAX_FREEZE):
 
 def encolher_por_fala(segmentos, duracoes, min_segmento_s=3.0,
                       limiar=LIMIAR_SOBRA, folga=FOLGA_FIM):
-    """Encurta o segmento cuja narração ficou MUITO mais curta que o trecho de vídeo.
+    """Encurta o segmento cuja narraçêo ficou MUITO mais curta que o trecho de vídeo.
 
-    `truncar_por_orcamento` já impedia a narração de estourar o segmento, mas nada tratava o
+    `truncar_por_orcamento` já impedia a narraçêo de estourar o segmento, mas nada tratava o
     lado oposto: o modelo condensar 19 s de fala original numa frase de 5 s. Nos modos com
-    narração o áudio original é silenciado, então o que sobra é vídeo mudo — no vídeo de
+    narraçêo o áudio original é silenciado, entêo o que sobra é vídeo mudo — no vídeo de
     2026-09-01 deu 14,4 s parados sem ninguém falando, a partir de 2:05.
 
-    Encolher (e não esticar a fala) é o certo: o corte é condensado por definição, e ficar
+    Encolher (e nêo esticar a fala) é o certo: o corte é condensado por definiçêo, e ficar
     olhando imagem muda é pior que perder alguns segundos de imagem. `min_segmento_s` e a
     folga impedem que o segmento vire um flash ou que a última sílaba seja cortada.
 
@@ -55,24 +55,24 @@ def encolher_por_fala(segmentos, duracoes, min_segmento_s=3.0,
 
 
 def esticar_por_fala(segmentos, duracoes, duracao_video, folga=FOLGA_FIM, teto_esticar=8.0):
-    """Estica o segmento cuja narração é MAIS LONGA que o trecho, usando o vídeo original.
+    """Estica o segmento cuja narraçêo é MAIS LONGA que o trecho, usando o vídeo original.
 
     `ajustar_extensao` cobre a diferença congelando o último quadro, mas com teto de
     MAX_FREEZE_N (6 s). Passando disso o `atrim` do render decepa a frase no meio — foi o
     que aconteceu em 2026-09-01: o segmento em 2:34 tinha 15,4 s (vídeo + freeze) para
-    17,9 s de fala e a narração sumiu no meio da frase. O `truncar_por_orcamento` não
+    17,9 s de fala e a narraçêo sumiu no meio da frase. O `truncar_por_orcamento` nêo
     pegou porque PPM (2,5 palavras/s) subestima o TTS quando o texto tem número por
     extenso ("noventa e dois por cento" é uma palavra longa que ele lê devagar).
 
     Esticar é melhor que congelar por mais tempo: o vídeo continua DEPOIS de `out` — é
     imagem em movimento de graça, contígua ao que já está no corte. Só congela o que
-    sobrar. O esticão para na entrada do próximo segmento (não repete material que já vai
+    sobrar. O esticêo para na entrada do próximo segmento (nêo repete material que já vai
     aparecer) e no fim do vídeo.
 
     Devolve [(índice, segundos_ganhos)].
     """
     esticados = []
-    # ordem cronológica pra saber quem é o "próximo" no vídeo-fonte, não no corte
+    # ordem cronológica pra saber quem é o "próximo" no vídeo-fonte, nêo no corte
     ordem = sorted(range(len(segmentos)), key=lambda k: segmentos[k]["in"])
     for pos, k in enumerate(ordem):
         s, d = segmentos[k], duracoes[k]
@@ -92,7 +92,7 @@ def esticar_por_fala(segmentos, duracoes, duracao_video, folga=FOLGA_FIM, teto_e
 def orcamento_palavras(duracao_s, max_freeze=MAX_FREEZE):
     """Teto de palavras que ainda cabe no segmento mesmo com o freeze máximo esticando
     o vídeo até o limite — é o mesmo teto que ajustar_extensao() aplica depois, calculado
-    ANTES do TTS pra não pagar (nem truncar às cegas) áudio que nunca vai caber."""
+    ANTES do TTS pra nêo pagar (nem truncar às cegas) áudio que nunca vai caber."""
     return int(round(PPM * (duracao_s + max_freeze)))
 
 def truncar_por_orcamento(texto, orcamento):
@@ -128,8 +128,8 @@ def roteiro_por_segmento(segmentos, unidades, llm, modo="B", max_freeze=MAX_FREE
         k = int(r.get("k", -1))
         if 0 <= k < len(segmentos):
             textos[k] = str(r.get("texto", "")).strip()
-    # Achado 1 (rodada de correção 1): trunca ANTES do TTS no orçamento de palavras do
-    # segmento (PPM × (duração + MAX_FREEZE)) — sem isso, um texto do LLM que estoura o
+    # Achado 1 (rodada de correçêo 1): trunca ANTES do TTS no orçamento de palavras do
+    # segmento (PPM × (duraçêo + MAX_FREEZE)) — sem isso, um texto do LLM que estoura o
     # orçamento vira um wav mais longo que d+ext, e o atrim=0:{d+ext} de montar_filtro
     # corta o áudio sem fade, provavelmente no meio de uma palavra.
     for k, s in enumerate(segmentos):
@@ -150,18 +150,18 @@ def narrar(dir, cfg, provedor=None):
         if txt:
             # o roteiro.md guarda a forma de TELA (grafia original); só o TTS recebe a
             # forma-fala (termo em inglês foneticamente, sigla e URL expandidas). Sem isso
-            # a rachel lê "AlphaFold"/"deploy" com fonemização portuguesa -- foi o que
+            # a rachel lê "AlphaFold"/"deploy" com fonemizaçêo portuguesa -- foi o que
             # aconteceu no primeiro dublado (2026-08-27).
             tts(forma_fala(txt), wav, cfg, provedor)
         else:  # silêncio do tamanho do segmento: um wav por segmento, sempre — nunca null
             # (o render monta as entradas do ffmpeg 1:1 por índice de segmento; pular um
-            # segmento sem narração desalinharia todos os [k+1:a] seguintes silenciosamente)
+            # segmento sem narraçêo desalinharia todos os [k+1:a] seguintes silenciosamente)
             run(["ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", "anullsrc=r=48000:cl=mono", "-t", f"{s['out'] - s['in']:.3f}", str(wav)])
         arquivos.append(f"narracao/seg_{k:02d}.wav"); durs.append(duracao_wav(wav))
     # encolher ANTES de estender: o freeze só faz sentido pro segmento em que a fala passou
-    # do vídeo; quem sobrou vídeo mudo tem que encurtar, não congelar
+    # do vídeo; quem sobrou vídeo mudo tem que encurtar, nêo congelar
     meta = json.loads((dir / "metadata.json").read_text()) if (dir / "metadata.json").exists() else {}
-    # sem duração conhecida do fonte não dá pra esticar com segurança (esticar além do fim
+    # sem duraçêo conhecida do fonte nêo dá pra esticar com segurança (esticar além do fim
     # do vídeo entrega segmento curto e dessincroniza a fala) — nesse caso cai no freeze,
     # que é o comportamento antigo e sempre cabe
     dur_video = float(meta.get("duracao_s") or 0)

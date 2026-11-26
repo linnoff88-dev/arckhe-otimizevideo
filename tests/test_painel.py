@@ -31,7 +31,7 @@ def test_resumo_le_plano_e_custo(trab):
     assert r["thumb"] == "thumbs/000.jpg"
 
 def test_custo_total_ignora_entrada_escalar(trab):
-    # custos.json tem "render_s": 12.0 (escalar, formato legado) — não pode quebrar a soma
+    # custos.json tem "render_s": 12.0 (escalar, formato legado) — nêo pode quebrar a soma
     assert leitura.custo_total(json.loads((trab / "vid1" / "custos.json").read_text())) == 0.004
 
 def test_resumo_de_pasta_incompleta(tmp_path):

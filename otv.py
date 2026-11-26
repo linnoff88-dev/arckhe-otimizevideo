@@ -10,24 +10,24 @@ from otv.painel.leitura import ARTEFATOS, custo_total  # única fonte de verdade
 def pasta(cfg, id_):
     d = Path(cfg["trabalho"]) / id_
     if not d.exists():
-        sys.exit(f"pasta de trabalho não encontrada: {d}")
+        sys.exit(f"pasta de trabalho nêo encontrada: {d}")
     return d
 
 def cmd_run(a, cfg):
     visual = a.visual or cfg["visual"]
     visual_e_modelo = visual in cfg["modelos"]
-    # CORREÇÃO 1+2 (rodada 1 de revisão): "local" (ou qualquer valor fora de cfg["modelos"])
-    # não é slot de modelo — criar_llm() levanta ValueError pra ele. Modo B/C sem
-    # classificação visual por modelo nunca vai ter unidade elegível (a guarda de
-    # selecionar()/VISUAL_MODO garante isso), então falha AQUI, antes de qualquer I/O ou
-    # chamada paga (ingest baixa vídeo, transcrever custa Groq, pontuar custa LLM) — não
-    # depois de já ter gasto tudo isso pra travar só no 'selecionar'. A condição não faz
+    # CORREÇêO 1+2 (rodada 1 de revisêo): "local" (ou qualquer valor fora de cfg["modelos"])
+    # nêo é slot de modelo — criar_llm() levanta ValueError pra ele. Modo B/C sem
+    # classificaçêo visual por modelo nunca vai ter unidade elegível (a guarda de
+    # selecionar()/VISUAL_MODO garante isso), entêo falha AQUI, antes de qualquer I/O ou
+    # chamada paga (ingest baixa vídeo, transcrever custa Groq, pontuar custa LLM) — nêo
+    # depois de já ter gasto tudo isso pra travar só no 'selecionar'. A condiçêo nêo faz
     # I/O nenhum: só olha a.modo e o slot resolvido.
-    # o modo N narra por cima do vídeo inteiro: não filtra por tipo de imagem, então não
-    # depende de classificação visual (igual ao A). Só B e C dependem.
+    # o modo N narra por cima do vídeo inteiro: nêo filtra por tipo de imagem, entêo nêo
+    # depende de classificaçêo visual (igual ao A). Só B e C dependem.
     if a.modo in ("B", "C") and not visual_e_modelo:
-        sys.exit(f"modo {a.modo} precisa de classificação visual por modelo — visual={visual!r} "
-                  "não é um slot de modelo (use --visual glm, --visual gemini ou --visual claude_cli)")
+        sys.exit(f"modo {a.modo} precisa de classificaçêo visual por modelo — visual={visual!r} "
+                  "nêo é um slot de modelo (use --visual glm, --visual gemini ou --visual claude_cli)")
     d = F_ing.ingest(a.fonte, cfg["trabalho"], forcar=a.forcar); print(f"[ingest] {d}")
     F_tr.transcrever(d, cfg, a.transcricao, forcar=a.forcar); print("[transcrever] ok")
     F_ce.cenas(d, cfg, forcar=a.forcar); print("[cenas] ok")
@@ -55,7 +55,7 @@ def cmd_status(a, cfg, d=None):
         if p.get("manchete"):
             print(f"  manchete: {p['manchete']}")
         for s in p["segmentos"]:
-            # marca o que o modo A+ já trocou por ilustração (Adendo, Task 12a)
+            # marca o que o modo A+ já trocou por ilustraçêo (Adendo, Task 12a)
             marca = "→img " if s.get("substituir") else ""
             print(f"    {s['in']:7.1f}–{s['out']:7.1f} ({s['out'] - s['in']:4.1f}s) {s.get('visual', '?'):12s} {marca}{s.get('texto', '')[:70]}")
         th = [k for k, s in enumerate(p["segmentos"]) if s.get("visual") == "talking_head"]
@@ -70,7 +70,7 @@ def cmd_custo(a, cfg):
             continue
         usd = (v.get("uso") or {}).get("cost") or 0
         print(f"  {fase:12s} {v.get('segundos', '-'):>7} s  US${usd:.4f}  {v.get('provedor', v.get('llm', ''))}")
-    print(f"  total US${custo_total(c):.4f} (transcrição Groq não reporta custo: ~US$0,04/h)")
+    print(f"  total US${custo_total(c):.4f} (transcriçêo Groq nêo reporta custo: ~US$0,04/h)")
 
 def cmd_painel(a, cfg):
     from otv.painel.servidor import servir
@@ -79,14 +79,14 @@ def cmd_painel(a, cfg):
     print(f"painel: http://localhost:{a.porta}")
     if a.host not in ("127.0.0.1", "localhost"):
         # a máquina pode ter várias redes (LAN dupla, Tailscale, docker0): lista todas as
-        # que um aparelho poderia usar, em vez de só a da rota padrão
+        # que um aparelho poderia usar, em vez de só a da rota padrêo
         try:
             ips = sp.run(["hostname", "-I"], capture_output=True, text=True, timeout=5).stdout.split()
         except (OSError, sp.SubprocessError):
             ips = []
         for ip in ips:
-            # só IPv4: o bind é 0.0.0.0, então imprimir um endereço v6 seria uma URL que
-            # não responde. E fora as bridges de docker/libvirt, por onde ninguém acessa.
+            # só IPv4: o bind é 0.0.0.0, entêo imprimir um endereço v6 seria uma URL que
+            # nêo responde. E fora as bridges de docker/libvirt, por onde ninguém acessa.
             if ":" in ip or ip.startswith(("172.1", "172.2", "172.3")) or ip.endswith(".1"):
                 continue
             marca = "  (tailscale — alcançável fora da LAN)" if ip.startswith("100.") else ""
@@ -109,9 +109,9 @@ def main():
         s_.add_argument("--modo", choices="ABCN", default="A"); s_.add_argument("--alvo", type=float, default=None)
         s_.add_argument("--transcricao"); s_.add_argument("--visual"); s_.add_argument("--pontuacao"); s_.add_argument("--tts")
         s_.add_argument("--rapido", action="store_true"); s_.add_argument("--sem-audio-original", action="store_true")
-        # com narração o áudio original sai por padrão; --com-cama traz de volta a -18 dB
+        # com narraçêo o áudio original sai por padrêo; --com-cama traz de volta a -18 dB
         s_.add_argument("--com-cama", action="store_true")
-        # modo A+ (Task 10b): troca os trechos de apresentador por ilustração gerada,
+        # modo A+ (Task 10b): troca os trechos de apresentador por ilustraçêo gerada,
         # mantendo o áudio original. Só 'gerado' por enquanto ('broll' ficou adiado).
         s_.add_argument("--substituir", choices=["gerado"]); s_.add_argument("--imagem")
         # chamada de ~12s (capa editorial + promessas) colada ANTES do conteúdo
@@ -120,10 +120,10 @@ def main():
     pa = sub.add_parser("painel", help="painel web na LAN pra mandar e ver o que já rodou")
     pa.add_argument("--porta", type=int, default=8022); pa.add_argument("--host", default="0.0.0.0")
     i = sub.add_parser("ingest"); i.add_argument("fonte"); i.add_argument("--forcar", action="store_true")
-    # CORREÇÃO 4 (rodada 1 de revisão): só declara --provedor/--forcar no subcomando que de
+    # CORREÇêO 4 (rodada 1 de revisêo): só declara --provedor/--forcar no subcomando que de
     # fato os repassa pra fase (ver main(), abaixo) — antes o loop dava as duas flags pra
     # todo mundo, inclusive status/custo (que nunca as usam) e selecionar/render/narrar
-    # (cujas fases não têm parâmetro forcar exposto no CLI), o que aparecia morto no --help.
+    # (cujas fases nêo têm parâmetro forcar exposto no CLI), o que aparecia morto no --help.
     USA_PROVEDOR = {"transcrever", "cenas", "pontuar", "narrar", "substituir", "abertura"}
     USA_FORCAR = {"transcrever", "cenas", "pontuar", "substituir", "abertura"}
     for nome in ("transcrever", "cenas", "pontuar", "selecionar", "substituir", "abertura", "render", "narrar", "status", "custo"):

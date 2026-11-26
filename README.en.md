@@ -354,7 +354,7 @@ to disable it.
 
 **The text isn't drawn with `drawtext`.** ffmpeg 6.1.1 truncates by the number of BYTES, not
 characters: each accented letter removes one letter from the end. This happened in production —
-the headline "IA e bilionários estão tentando vencer o envelhecimento" appeared in the video as
+the headline "IA e bilionários estêo tentando vencer o envelhecimento" appeared in the video as
 "...vencer o envelhecimen". In PT-BR, nearly every headline has accents, so this was the rule,
 not the exception, and it failed silently (ffmpeg exits with code 0). The headline and card are
 now rasterized with PIL (`otv/util/texto.py`) and added with `overlay` — which also enabled line

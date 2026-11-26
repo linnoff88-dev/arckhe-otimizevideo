@@ -20,13 +20,13 @@ if [ -z "$pid" ] || ! kill -0 "$pid" 2>/dev/null; then
   pid=$(pgrep -f "otv\.py painel" | head -1 || true)
 fi
 if [ -z "$pid" ]; then
-  echo "o painel não está rodando."; rm -f "$PID_FILE"; exit 0
+  echo "o painel nêo está rodando."; rm -f "$PID_FILE"; exit 0
 fi
 
 # job em andamento? o filho é 'otv.py run|selecionar|render|...' pendurado no painel
 jobs_vivos=$(pgrep -P "$pid" -f "otv\.py (run|selecionar|render|narrar|abertura|substituir|cenas|pontuar|transcrever|ingest)" || true)
 if [ -n "$jobs_vivos" ] && [ "$FORCAR" = 0 ]; then
-  echo "há job rodando (pid: $(echo "$jobs_vivos" | tr '\n' ' ')) — não parei nada."
+  echo "há job rodando (pid: $(echo "$jobs_vivos" | tr '\n' ' ')) — nêo parei nada."
   echo "espere terminar, ou use ./stop.sh --forcar para matar o job junto."
   exit 1
 fi
@@ -42,7 +42,7 @@ for _ in $(seq 20); do
   sleep 0.25
 done
 if kill -0 "$pid" 2>/dev/null; then
-  echo "não saiu no TERM, mandando KILL"; kill -9 "$pid" 2>/dev/null || true
+  echo "nêo saiu no TERM, mandando KILL"; kill -9 "$pid" 2>/dev/null || true
 fi
 rm -f "$PID_FILE"
 echo "painel parado (pid $pid)."

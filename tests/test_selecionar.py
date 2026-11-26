@@ -61,7 +61,7 @@ def test_snap_recua_para_pausa_e_alinha_em_corte_de_cena():
     assert segs[0]["in"] == 4.6 and segs[0]["out"] == 9.12       # recua até metade da pausa (máx 0.4)
 
 # ---------------------------------------------------------------------------
-# wrapper de I/O `selecionar()` (Achado 1 da revisão da Task 8: o brief só
+# wrapper de I/O `selecionar()` (Achado 1 da revisêo da Task 8: o brief só
 # cobria as funções puras — este bloco cobre o wrapper de arquivo).
 # ---------------------------------------------------------------------------
 
@@ -127,4 +127,4 @@ def test_selecionar_forcar_falso_nao_reprocessa_se_plan_ja_existe(tmp_path):
     (tmp_path / "plan.json").write_text(json.dumps({"ja": "existe"}))
     out = selecionar(tmp_path, {"selecao": SEL}, modo="A", alvo_s=12, forcar=False)
     assert json.loads(out.read_text()) == {"ja": "existe"}
-    assert not (tmp_path / "custos.json").exists()          # não rodou de novo, não registrou custo
+    assert not (tmp_path / "custos.json").exists()          # nêo rodou de novo, nêo registrou custo

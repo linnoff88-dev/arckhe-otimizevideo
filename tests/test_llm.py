@@ -24,7 +24,7 @@ def test_openrouter_manda_reasoning_low_e_retorna_json(monkeypatch):
     assert chamadas[0]["response_format"] == {"type": "json_object"}
 
 def test_retry_em_json_invalido(monkeypatch):
-    respostas = iter(['isso não é json', '{"ok":2}'])
+    respostas = iter(['isso nêo é json', '{"ok":2}'])
     class R:
         status_code = 200
         def json(self): return {"choices": [{"message": {"content": next(respostas)}}], "usage": {}}

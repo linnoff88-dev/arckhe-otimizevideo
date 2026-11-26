@@ -85,7 +85,7 @@ video{width:100%;max-width:520px;border-radius:8px;margin-top:10px;background:#0
       <label>Modo</label>
       <select id="modo">
         <option value="A">A — fala original, apresentador incluso</option>
-        <option value="N">N — vídeo inteiro, narração regravada</option>
+        <option value="N">N — vídeo inteiro, narraçêo regravada</option>
         <option value="B">B — sem apresentador: slide, demo e gráfico</option>
         <option value="C">C — só demo de tela e gráfico</option>
       </select>
@@ -101,7 +101,7 @@ video{width:100%;max-width:520px;border-radius:8px;margin-top:10px;background:#0
     <div style="flex:none"><button id="rodar">Rodar</button></div>
   </div>
   <div class="acoes">
-    <span class="chk"><input type="checkbox" id="substituir"><label for="substituir" style="margin:0;text-transform:none;letter-spacing:0">A+ — trocar o apresentador por ilustração gerada</label></span>
+    <span class="chk"><input type="checkbox" id="substituir"><label for="substituir" style="margin:0;text-transform:none;letter-spacing:0">A+ — trocar o apresentador por ilustraçêo gerada</label></span>
     <span class="chk"><input type="checkbox" id="abertura"><label for="abertura" style="margin:0;text-transform:none;letter-spacing:0">abertura</label></span>
     <span class="chk"><input type="checkbox" id="forcar"><label for="forcar" style="margin:0;text-transform:none;letter-spacing:0">--forcar (refaz tudo, custa de novo)</label></span>
   </div>
@@ -187,7 +187,7 @@ function cardRodada(r){
     <div class="tags">${tags}</div>
     <div class="acoes">
       ${r.tem_saida ? `<button class="sec" data-ver="${esc(r.id)}">${aberta ? 'fechar' : 'ver corte'}</button>` : ''}
-      ${r.plano ? `<button class="sec" data-editar="${esc(r.id)}">${editando === r.id ? 'fechar edição' : 'editar corte'}</button>` : ''}
+      ${r.plano ? `<button class="sec" data-editar="${esc(r.id)}">${editando === r.id ? 'fechar ediçêo' : 'editar corte'}</button>` : ''}
       <button class="sec" data-refazer="${esc(r.id)}" data-fase="selecionar">re-selecionar (US$0)</button>
       <button class="sec" data-refazer="${esc(r.id)}" data-fase="render">re-render (US$0)</button>
     </div>
@@ -199,11 +199,11 @@ function cardRodada(r){
 async function atualizar(){
   let d;
   try{ d = await api('/api/rodadas'); }
-  catch(e){ $('sub').textContent = 'sem conexão com o servidor'; return; }
+  catch(e){ $('sub').textContent = 'sem conexêo com o servidor'; return; }
 
   const rodando = d.jobs.find(j => j.estado === 'rodando');
   const naFila = d.jobs.filter(j => j.estado === 'na_fila').length;
-  $('sub').textContent = `${d.rodadas.length} rodadas · ${rodando ? '1 job rodando' : 'ocioso'}${naFila ? ` · ${naFila} na fila` : ''} · pontuação ${d.cfg.pontuacao}`;
+  $('sub').textContent = `${d.rodadas.length} rodadas · ${rodando ? '1 job rodando' : 'ocioso'}${naFila ? ` · ${naFila} na fila` : ''} · pontuaçêo ${d.cfg.pontuacao}`;
 
   if(!jobAtivo && rodando){ jobAtivo = rodando.job; posLog = 0; $('log').textContent = ''; }
   const j = d.jobs.find(x => x.job === jobAtivo);
@@ -225,7 +225,7 @@ async function atualizar(){
   }
 
   // só redesenha a lista quando algo mudou de verdade: redesenhar a cada 2s recriaria o
-  // <video> aberto e cortaria a reprodução no meio.
+  // <video> aberto e cortaria a reproduçêo no meio.
   const nova = JSON.stringify([d.rodadas, [...abertas].sort(), editando]);
   if(nova === assinatura) return;
   assinatura = nova;
@@ -246,33 +246,33 @@ async function atualizar(){
   if(editando) abrirEditor(editando);
 }
 
-// A/B/C/N e o A+ dependem de classificação visual por modelo. O slot 'local' só distingue
-// "tem rosto" de "não tem" — pedir B/C/A+ com ele falha lá na frente, depois de já ter
-// gasto transcrição e pontuação. Avisar aqui é mais barato que descobrir no log.
+// A/B/C/N e o A+ dependem de classificaçêo visual por modelo. O slot 'local' só distingue
+// "tem rosto" de "nêo tem" — pedir B/C/A+ com ele falha lá na frente, depois de já ter
+// gasto transcriçêo e pontuaçêo. Avisar aqui é mais barato que descobrir no log.
 const DESC = {
   A: 'Condensa o vídeo mantendo a <b>fala original</b> — a voz de quem gravou. Roda de graça no slot visual.',
-  N: 'Mantém o <b>vídeo inteiro</b> na tela e regrava o áudio como narração fluente, ligando os saltos do corte. Não filtra imagem.',
-  B: 'Descarta o apresentador: só <b>slide, demo de tela e gráfico</b>, com narração regravada.',
+  N: 'Mantém o <b>vídeo inteiro</b> na tela e regrava o áudio como narraçêo fluente, ligando os saltos do corte. Nêo filtra imagem.',
+  B: 'Descarta o apresentador: só <b>slide, demo de tela e gráfico</b>, com narraçêo regravada.',
   C: 'O mais restrito — só <b>demo de tela e gráfico</b>, sem nem slide.'
 };
 function dica(){
   const m = $('modo').value, v = $('visual').value, sub = $('substituir').checked;
   const porModelo = v && v !== 'local';               // vazio = usa o config, que hoje é local
   let t = DESC[m];
-  if(sub) t += ' <b>A+</b>: troca o vídeo dos trechos de apresentador por ilustração gerada (o áudio original continua).';
+  if(sub) t += ' <b>A+</b>: troca o vídeo dos trechos de apresentador por ilustraçêo gerada (o áudio original continua).';
   const precisa = ['B','C'].includes(m) || sub;
   if(precisa && !porModelo)
-    t += ' <b>⚠ escolha Visual = glm</b> — com <code>local</code> isto falha: a detecção local não sabe o que é slide/demo/gráfico.';
+    t += ' <b>⚠ escolha Visual = glm</b> — com <code>local</code> isto falha: a detecçêo local nêo sabe o que é slide/demo/gráfico.';
   else if(porModelo)
-    t += ' Classificação visual por modelo: +US$0,01 no total.';
+    t += ' Classificaçêo visual por modelo: +US$0,01 no total.';
   $('dica').innerHTML = t;
 }
 ['modo','visual','substituir'].forEach(i => $(i).addEventListener('change', dica));
 dica();
 
 // ---- editor de corte -------------------------------------------------------
-// Edita o mesmo plan.json da seção 9 do README, pela tela. Só in/out e a inclusão de cada
-// segmento (mais a manchete) são editáveis — o resto o servidor preserva do plano original.
+// Edita o mesmo plan.json da seçêo 9 do README, pela tela. Só in/out e a inclusêo de cada
+// segmento (mais a manchete) sêo editáveis — o resto o servidor preserva do plano original.
 async function abrirEditor(id){
   const alvo = document.getElementById('editor');
   if(!alvo) return;

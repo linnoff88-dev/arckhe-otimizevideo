@@ -46,7 +46,7 @@ def test_pontuar_idempotente_sem_forcar(tmp_path, monkeypatch):
     (tmp_path / "metadata.json").write_text(json.dumps({"titulo": "T", "duracao_s": 600}))
     (tmp_path / "notas.json").write_text(json.dumps({"ja": "existe"}))
     def boom(cfg, slot):
-        raise AssertionError("não deveria chamar criar_llm quando notas.json já existe")
+        raise AssertionError("nêo deveria chamar criar_llm quando notas.json já existe")
     import otv.fases.pontuar as P
     monkeypatch.setattr(P, "criar_llm", boom)
     out = pontuar(tmp_path, {"pontuacao": "glm", "selecao": {"alvo_s": 120}}, modo="A")

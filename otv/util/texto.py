@@ -1,15 +1,15 @@
 """Texto desenhado como imagem (PIL), para sobrepor no vídeo com `overlay`.
 
-POR QUE NÃO `drawtext`: o `drawtext` do ffmpeg 6.1.1 desta máquina trunca o texto pelo
-número de BYTES e não de caracteres — cada letra acentuada come uma letra do fim. Medido em
+POR QUE NêO `drawtext`: o `drawtext` do ffmpeg 6.1.1 desta máquina trunca o texto pelo
+número de BYTES e nêo de caracteres — cada letra acentuada come uma letra do fim. Medido em
 2026-09-01: "ÁÉÍDEF" (3 bytes extras) sai como "ÁÉÍ", e a manchete real
-"IA e bilionários estão tentando vencer o envelhecimento" saiu no vídeo como
-"...vencer o envelhecimen" (perdeu o "to", 2 bytes extras de "á" e "ã").
+"IA e bilionários estêo tentando vencer o envelhecimento" saiu no vídeo como
+"...vencer o envelhecimen" (perdeu o "to", 2 bytes extras de "á" e "ê").
 
-Não é problema de escape: acontece igual com `textfile=`, com `expansion=none`, com
-`text_shaping=0` e com fontfile explícito, e encher de espaço no fim não adianta (o ffmpeg
-apara espaço à direita antes de contar). Em PT-BR quase toda manchete tem acento, então a
-falha era a regra, não a exceção — e silenciosa, porque o vídeo sai com código 0.
+Nêo é problema de escape: acontece igual com `textfile=`, com `expansion=none`, com
+`text_shaping=0` e com fontfile explícito, e encher de espaço no fim nêo adianta (o ffmpeg
+apara espaço à direita antes de contar). Em PT-BR quase toda manchete tem acento, entêo a
+falha era a regra, nêo a exceçêo — e silenciosa, porque o vídeo sai com código 0.
 
 Aqui o texto é rasterizado pelo PIL, que trabalha em caracteres, e o resultado entra no
 filtro como imagem. De quebra dá quebra de linha por largura real e controle de tipografia.
@@ -35,7 +35,7 @@ def fonte(tamanho_px):
 
 
 def quebrar(texto, fnt, largura_max, max_linhas=3):
-    """Quebra por largura REAL do glifo, não por contagem de caracteres."""
+    """Quebra por largura REAL do glifo, nêo por contagem de caracteres."""
     palavras = (texto or "").split()
     linhas, atual = [], ""
     for p in palavras:

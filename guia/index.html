@@ -128,18 +128,18 @@
 </header>
 <section id="oque"><div class="wrap">
 <span class="chip">O que é</span>
-<h2>Um cortador de vídeo em que a decisão é auditável</h2>
+<h2>Um cortador de vídeo em que a decisêo é auditável</h2>
 <p class="sub">Aula, podcast ou palestra de 20 a 30 minutos entram; sai um <code>output.mp4</code> de cerca de dois minutos com o melhor conteúdo. Cada fase grava um JSON que dá pra ler, editar e re-renderizar sem gastar nada.</p>
 <div class="grid g3">
-<div class="card"><h3>🎯 O modelo pontua, não corta</h3><p>Ele vê <code>[042] 4.2s talking_head "texto"</code> e devolve uma nota. O tempo vem da transcrição com timestamp por palavra, então a fronteira do corte já é uma fronteira de palavra real — nunca um timestamp inventado.</p></div>
-<div class="card"><h3>🔁 Determinístico e barato de refazer</h3><p>A escolha (mochila por nota, cota por tópico, âncoras de gancho e fecho, coesão) é código. Mesmo <code>notas.json</code>, mesmo <code>plan.json</code>. Editar o plano à mão e re-renderizar custa zero chamada de modelo.</p></div>
-<div class="card"><h3>🔌 Provedor trocável por fase</h3><p>Transcrição no Groq ou Whisper local; pontuação no GLM, Gemini, Ollama ou no próprio Claude Code; TTS no inemavox ou ElevenLabs; imagem no flux-2-klein. Uma linha no <code>config.yaml</code> ou uma flag.</p></div>
+<div class="card"><h3>🎯 O modelo pontua, nêo corta</h3><p>Ele vê <code>[042] 4.2s talking_head "texto"</code> e devolve uma nota. O tempo vem da transcriçêo com timestamp por palavra, entêo a fronteira do corte já é uma fronteira de palavra real — nunca um timestamp inventado.</p></div>
+<div class="card"><h3>🔁 Determinístico e barato de refazer</h3><p>A escolha (mochila por nota, cota por tópico, âncoras de gancho e fecho, coesêo) é código. Mesmo <code>notas.json</code>, mesmo <code>plan.json</code>. Editar o plano à mêo e re-renderizar custa zero chamada de modelo.</p></div>
+<div class="card"><h3>🔌 Provedor trocável por fase</h3><p>Transcriçêo no Groq ou Whisper local; pontuaçêo no GLM, Gemini, Ollama ou no próprio Claude Code; TTS no inemavox ou ElevenLabs; imagem no flux-2-klein. Uma linha no <code>config.yaml</code> ou uma flag.</p></div>
 </div>
 </div></section>
 <section id="fluxo"><div class="wrap">
 <span class="chip">Como funciona</span>
 <h2>Nove fases, um JSON entre cada uma</h2>
-<p class="sub">Cada fase lê o artefato da anterior e grava o seu. Rodar uma fase de novo não refaz as outras — e o que já existe é reaproveitado, a menos que você peça <code>--forcar</code>.</p>
+<p class="sub">Cada fase lê o artefato da anterior e grava o seu. Rodar uma fase de novo nêo refaz as outras — e o que já existe é reaproveitado, a menos que você peça <code>--forcar</code>.</p>
 <div class="flow">
 <span>ingest</span><span class="arr">→</span>
 <span>transcrever</span><span class="arr">→</span>
@@ -152,9 +152,9 @@
 <span>render</span>
 </div>
 <div class="grid g3" style="margin-top:26px">
-<div class="card"><h3>Modo A — condensado</h3><p>O padrão. Mantém o apresentador e corta só o que rende. Variante A+ (<code>--substituir gerado</code>) troca os trechos de apresentador por ilustração gerada e <strong>preserva o áudio original</strong>.</p></div>
+<div class="card"><h3>Modo A — condensado</h3><p>O padrêo. Mantém o apresentador e corta só o que rende. Variante A+ (<code>--substituir gerado</code>) troca os trechos de apresentador por ilustraçêo gerada e <strong>preserva o áudio original</strong>.</p></div>
 <div class="card"><h3>Modo B — sem apresentador</h3><p>Fica só com slide, demo de tela e gráfico; um roteiro em PT-BR é escrito pelo modelo e narrado por TTS, com o áudio original virando cama a −18 dB.</p></div>
-<div class="card"><h3>Modo C — só visual</h3><p>Mesma seleção do B, sem a camada de narração — para quando o material visual já se explica.</p></div>
+<div class="card"><h3>Modo C — só visual</h3><p>Mesma seleçêo do B, sem a camada de narraçêo — para quando o material visual já se explica.</p></div>
 </div>
 </div></section>
 <section id="pre"><div class="wrap">
@@ -175,7 +175,7 @@ FAL_KEY  <span class="c"># só no modo A+</span></pre></div>
 <section id="guia"><div class="wrap">
 <span class="chip">Guia de uso · passo a passo</span>
 <h2>Do link ao corte de dois minutos</h2>
-<p class="sub">Todos os comandos abaixo são reais e foram rodados na validação ponta a ponta. O <code>&lt;id&gt;</code> é o nome da pasta criada em <code>trabalho/</code>.</p>
+<p class="sub">Todos os comandos abaixo sêo reais e foram rodados na validaçêo ponta a ponta. O <code>&lt;id&gt;</code> é o nome da pasta criada em <code>trabalho/</code>.</p>
 <div class="step"><div class="b">1</div><div>
 <h3>Rode o pipeline inteiro</h3>
 <p>Uma linha faz tudo: baixa, transcreve, detecta cena, pontua, seleciona e renderiza. O resultado é copiado para <code>~/projetos/output/otimizevideo/&lt;id&gt;/</code>.</p>
@@ -183,34 +183,34 @@ FAL_KEY  <span class="c"># só no modo A+</span></pre></div>
 </div></div>
 <div class="step"><div class="b">2</div><div>
 <h3>Veja o que foi escolhido</h3>
-<p>O <code>status</code> lista os artefatos, a manchete e cada segmento com tempo, duração e classificação visual.</p>
+<p>O <code>status</code> lista os artefatos, a manchete e cada segmento com tempo, duraçêo e classificaçêo visual.</p>
 <pre><span class="k">python3 otv.py status</span> &lt;id&gt;  <span class="c"># plan: modo A · 136.6s em 18 segmentos</span></pre>
 </div></div>
 <div class="step"><div class="b">3</div><div>
 <h3>Confira o gasto</h3>
-<p>Cada fase registra tempo e custo em <code>trabalho/&lt;id&gt;/custos.json</code>. Uma condensação típica sai por centavos de dólar.</p>
+<p>Cada fase registra tempo e custo em <code>trabalho/&lt;id&gt;/custos.json</code>. Uma condensaçêo típica sai por centavos de dólar.</p>
 <pre><span class="k">python3 otv.py custo</span> &lt;id&gt;  <span class="c"># total US$0.0023</span></pre>
 </div></div>
 <div class="step"><div class="b">4</div><div>
-<h3>Não gostou de um trecho? Edite o plano</h3>
+<h3>Nêo gostou de um trecho? Edite o plano</h3>
 <p>Abra o <code>plan.json</code>, tire ou ajuste um segmento e renderize de novo. <strong>Nenhuma chamada de modelo acontece</strong> — o corte manual é de graça.</p>
 <pre><span class="k">$EDITOR</span> trabalho/&lt;id&gt;/plan.json
 <span class="k">python3 otv.py render</span> &lt;id&gt;</pre>
 </div></div>
 <div class="step"><div class="b">5</div><div>
 <h3>Troque o provedor de uma fase só</h3>
-<p>As fases são independentes: re-pontuar com outro modelo não refaz a transcrição nem o download.</p>
+<p>As fases sêo independentes: re-pontuar com outro modelo nêo refaz a transcriçêo nem o download.</p>
 <pre><span class="k">python3 otv.py pontuar</span> &lt;id&gt; --provedor gemini --forcar
 <span class="k">python3 otv.py selecionar</span> &lt;id&gt; &amp;&amp; <span class="k">python3 otv.py render</span> &lt;id&gt;</pre>
 </div></div>
 <div class="step"><div class="b">6</div><div>
-<h3>Modo B — vídeo sem apresentador, com narração</h3>
-<p>Fica só com slide, demo e gráfico. Precisa da classificação visual por modelo, então passe <code>--visual</code>.</p>
+<h3>Modo B — vídeo sem apresentador, com narraçêo</h3>
+<p>Fica só com slide, demo e gráfico. Precisa da classificaçêo visual por modelo, entêo passe <code>--visual</code>.</p>
 <pre><span class="k">python3 otv.py run</span> <span class="s">"&lt;url&gt;"</span> --modo B --visual glm  <span class="c"># roteiro.md + narracao/*.wav</span></pre>
 </div></div>
 <div class="step"><div class="b">7</div><div>
-<h3>Modo A+ — apresentador vira ilustração</h3>
-<p>Cada trecho com rosto é trocado por uma imagem gerada com Ken Burns lento. O áudio segue sendo o original, então a fala não muda.</p>
+<h3>Modo A+ — apresentador vira ilustraçêo</h3>
+<p>Cada trecho com rosto é trocado por uma imagem gerada com Ken Burns lento. O áudio segue sendo o original, entêo a fala nêo muda.</p>
 <pre><span class="k">python3 otv.py run</span> <span class="s">"&lt;url&gt;"</span> --modo A --visual glm --substituir gerado</pre>
 </div></div>
 </div></section>
@@ -219,15 +219,15 @@ FAL_KEY  <span class="c"># só no modo A+</span></pre></div>
 <h2>Rodado num vídeo real de 20 minutos</h2>
 <p class="sub">Fonte de 1206 s em inglês sobre longevidade e IA, condensado para 136,6 s em 18 segmentos por US$0,0023 de modelo. O render leva 21 segundos.</p>
 <div class="ex">
-<figure><img alt="Quadro de um trecho substituído por ilustração no modo A+" src="assets/ex1.jpg"/><figcaption>Modo A+: o trecho de apresentador virou natureza-morta conceitual gerada por IA — o áudio continua o original.</figcaption></figure>
-<figure><img alt="Quadro de um trecho preservado do vídeo original" src="assets/ex2.jpg"/><figcaption>Um segmento preservado do fonte: corte com precisão de quadro, começando e terminando em fronteira de palavra.</figcaption></figure>
+<figure><img alt="Quadro de um trecho substituído por ilustraçêo no modo A+" src="assets/ex1.jpg"/><figcaption>Modo A+: o trecho de apresentador virou natureza-morta conceitual gerada por IA — o áudio continua o original.</figcaption></figure>
+<figure><img alt="Quadro de um trecho preservado do vídeo original" src="assets/ex2.jpg"/><figcaption>Um segmento preservado do fonte: corte com precisêo de quadro, começando e terminando em fronteira de palavra.</figcaption></figure>
 </div>
 </div></section>
 <section id="roadmap"><div class="wrap">
 <span class="chip">Roadmap</span>
 <h2>Onde o projeto está</h2>
 <p class="sub">O pipeline está implementado e validado ponta a ponta. O que vem depois é escala e formato.</p>
-<div class="phase"><div class="tag">Pronto</div><div class="d"><strong>Pipeline completo, modos A, A+, B e C</strong><span>Nove fases, CLI com fase avulsa, 110 testes, validação ponta a ponta registrada na spec.</span></div></div>
+<div class="phase"><div class="tag">Pronto</div><div class="d"><strong>Pipeline completo, modos A, A+, B e C</strong><span>Nove fases, CLI com fase avulsa, 110 testes, validaçêo ponta a ponta registrada na spec.</span></div></div>
 <div class="phase"><div class="tag">Pronto</div><div class="d"><strong>Robustez do render</strong><span>Um input de ffmpeg por segmento e teto de memória — antes um filtergraph único chegava a 60,9 GB e travava a máquina.</span></div></div>
 <div class="phase"><div class="tag">Próximo</div><div class="d"><strong>Saída 9:16 e lote</strong><span>Corte vertical para Reels e Shorts, e uma playlist inteira num comando.</span></div></div>
 <div class="phase"><div class="tag">Ideia</div><div class="d"><strong>Modo A+ com b-roll real</strong><span>Trocar o apresentador por vídeo de arquivo em vez de imagem estática.</span></div></div>

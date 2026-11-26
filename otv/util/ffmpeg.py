@@ -2,10 +2,10 @@ import json, os, shutil, subprocess
 
 # --- teto de memória para o ffmpeg -----------------------------------------
 # Em 2026-08-27 um render de um fonte de 20 min chegou a 60,9 GB de RSS e travou o host
-# inteiro (a máquina não respondia mais; o kernel nem chegou a disparar o OOM killer).
+# inteiro (a máquina nêo respondia mais; o kernel nem chegou a disparar o OOM killer).
 # A causa foi corrigida em render.py (um input por segmento), mas um teto continua sendo
 # o cinto de segurança: com ele, quem morre é o ffmpeg, nunca a máquina.
-# Fail-open: se systemd-run não existir ou não funcionar aqui, roda direto, sem teto.
+# Fail-open: se systemd-run nêo existir ou nêo funcionar aqui, roda direto, sem teto.
 MEMMAX = os.environ.get("OTV_FFMPEG_MEMMAX", "16G")
 _scope = None
 

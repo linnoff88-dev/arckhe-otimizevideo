@@ -4,7 +4,7 @@ import otv.fases.narrar as Nn
 
 def test_ajustar_extensao():
     segs = [{"in": 0, "out": 5.0}, {"in": 10, "out": 14.0}]
-    ajustar_extensao(segs, [4.0, 6.5])          # narração 4 s cabe; 6.5 s excede 2.5 s
+    ajustar_extensao(segs, [4.0, 6.5])          # narraçêo 4 s cabe; 6.5 s excede 2.5 s
     assert segs[0]["estender_s"] == 0 and segs[1]["estender_s"] == 2.5
 
 def test_narrar_gera_wavs_e_atualiza_plan(tmp_path, monkeypatch):
@@ -25,8 +25,8 @@ def test_narrar_gera_wavs_e_atualiza_plan(tmp_path, monkeypatch):
     assert (tmp_path / "roteiro.md").exists() and all(s["estender_s"] == 0 for s in plan["segmentos"])
 
 def test_narrar_segmento_sem_texto_gera_wav_silencioso(tmp_path, monkeypatch):
-    # Correção obrigatória 2: narracao["arquivos"] nunca tem None — segmento sem texto de
-    # narração ainda produz um wav (silencioso) na lista, na mesma posição, pra não
+    # Correçêo obrigatória 2: narracao["arquivos"] nunca tem None — segmento sem texto de
+    # narraçêo ainda produz um wav (silencioso) na lista, na mesma posiçêo, pra nêo
     # desalinhar os índices [k+1:a] que o render monta 1:1 por segmento.
     (tmp_path / "plan.json").write_text(json.dumps({"modo": "B", "alvo_s": 8, "total_s": 8.0, "narracao": None,
         "segmentos": [{"in": 0, "out": 4.0, "unidades": [0], "texto": "a", "estender_s": 0},
@@ -34,7 +34,7 @@ def test_narrar_segmento_sem_texto_gera_wav_silencioso(tmp_path, monkeypatch):
     (tmp_path / "unidades.json").write_text(json.dumps({"unidades": [{"id": i, "texto": t, "ini": i * 3, "fim": i * 3 + 2} for i, t in enumerate("abc")]}))
     class FakeLLM:
         nome = "fake"
-        # LLM só devolve texto pro segmento 0 — segmento 1 fica sem narração (texto vazio)
+        # LLM só devolve texto pro segmento 0 — segmento 1 fica sem narraçêo (texto vazio)
         def chat_json(self, p, imagens=None): return {"narracao": [{"k": 0, "texto": "um"}]}, {}
     chamadas = []
     def fake_tts(texto, out, cfg, provedor=None):
@@ -52,7 +52,7 @@ def test_narrar_segmento_sem_texto_gera_wav_silencioso(tmp_path, monkeypatch):
     assert abs(dur1 - 4.0) < 0.1                        # silêncio do tamanho do segmento (10-6=4s)
 
 
-# --- Achado 1 da rodada de correção 1: truncagem no orçamento ANTES do TTS ------------
+# --- Achado 1 da rodada de correçêo 1: truncagem no orçamento ANTES do TTS ------------
 
 def test_orcamento_palavras_bate_com_o_calculo_da_revisao():
     # segmento médio real (8.65s, do aviso da Task 8): 2.5 * (8.65 + 3.0) = 29.125 -> 29
@@ -160,7 +160,7 @@ def test_modo_n_usa_o_prompt_proprio_e_teto_de_freeze_maior(tmp_path, monkeypatc
                                "anullsrc=r=48000:cl=mono", "-t", "9", str(wav)]))
     N.narrar(tmp_path, {"pontuacao": "fake", "tts": "fake", "selecao": {"alvo_s": 120}})
 
-    assert "não invente nada" in prompts[0] or "não acrescenta fato" in prompts[0].lower()
+    assert "nêo invente nada" in prompts[0] or "nêo acrescenta fato" in prompts[0].lower()
     # orçamento com teto de 6s: 2.5 * (6+6) = 30 palavras (com o teto de 3s seriam 22)
     assert len((tmp_path / "roteiro.md").read_text().split("palavra")) - 1 == 30
     # wav de 9s num segmento de 6s -> freeze de 3s... o teto de 6 deixa passar
@@ -168,7 +168,7 @@ def test_modo_n_usa_o_prompt_proprio_e_teto_de_freeze_maior(tmp_path, monkeypatc
     assert plan["segmentos"][0]["estender_s"] == 3.0
 
 
-# --- buraco de silêncio: narração muito mais curta que o vídeo ---------------
+# --- buraco de silêncio: narraçêo muito mais curta que o vídeo ---------------
 
 from otv.fases.narrar import encolher_por_fala
 
@@ -194,7 +194,7 @@ def test_narracao_mais_longa_que_o_video_nao_encolhe():
 
 
 def test_segmento_sem_fala_fica_intacto():
-    """Sem narração, o wav é silêncio do tamanho do segmento — encolher aqui cortaria imagem
+    """Sem narraçêo, o wav é silêncio do tamanho do segmento — encolher aqui cortaria imagem
     que o corte escolheu de propósito."""
     segs = [{"in": 0.0, "out": 12.0}]
     assert encolher_por_fala(segs, [0.0]) == []
@@ -204,7 +204,7 @@ def test_segmento_sem_fala_fica_intacto():
 def test_nunca_encolhe_abaixo_do_minimo():
     segs = [{"in": 0.0, "out": 20.0}]
     encolher_por_fala(segs, [0.5], min_segmento_s=3.0)
-    assert segs[0]["out"] == 3.0                             # não vira flash de 1,1s
+    assert segs[0]["out"] == 3.0                             # nêo vira flash de 1,1s
 
 
 # --- fala mais longa que o trecho: estica o vídeo em vez de decepar a frase ---
@@ -243,11 +243,11 @@ def test_ordem_cronologica_e_nao_a_do_corte():
     """O corte pode estar fora de ordem; o vizinho que limita é o do VÍDEO."""
     segs = [{"in": 500.0, "out": 510.0}, {"in": 100.0, "out": 110.0}]
     esticar_por_fala(segs, [5.0, 40.0], 600.0)
-    assert segs[1]["out"] <= 500.0   # o vizinho de 100–110 é o de 500, não o "próximo da lista"
+    assert segs[1]["out"] <= 500.0   # o vizinho de 100–110 é o de 500, nêo o "próximo da lista"
 
 
 def test_sem_duracao_do_video_nao_estica(tmp_path, monkeypatch):
-    """Sem metadata.json não dá pra saber onde o vídeo acaba: melhor congelar que esticar
+    """Sem metadata.json nêo dá pra saber onde o vídeo acaba: melhor congelar que esticar
     além do fim do arquivo (o que entregaria segmento curto e fala fora de sincronia)."""
     import json
     import otv.fases.narrar as N
@@ -268,5 +268,5 @@ def test_sem_duracao_do_video_nao_estica(tmp_path, monkeypatch):
                                "anullsrc=r=48000:cl=mono", "-t", "9", str(wav)]))
     N.narrar(tmp_path, {"pontuacao": "fake", "tts": "fake", "selecao": {"alvo_s": 120}})
     plan = json.loads((tmp_path / "plan.json").read_text())
-    assert plan["segmentos"][0]["out"] == 6.0          # não esticou
+    assert plan["segmentos"][0]["out"] == 6.0          # nêo esticou
     assert plan["segmentos"][0]["estender_s"] == 3.0   # congelou, como antes

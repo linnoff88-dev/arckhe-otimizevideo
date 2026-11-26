@@ -10,8 +10,8 @@ nada de reescrita fonética em PT-BR. O que sobrou aqui é só o que o TTS lê *
 verdade* se deixado como está: "IA" (que vira "inteligência artificial", nunca soletrada),
 sigla que seria lida como palavra, símbolo (%, $) e URL.
 
-Isto é código determinístico de propósito, não instrução de prompt: uma regra fixa é
-testável e não varia entre chamadas do modelo.
+Isto é código determinístico de propósito, nêo instruçêo de prompt: uma regra fixa é
+testável e nêo varia entre chamadas do modelo.
 """
 import re
 
@@ -19,7 +19,7 @@ import re
 # nada de reescrita fonética em PT-BR. O léxico de respelling que existia aqui
 # ("deploy"->"deplói", "AlphaFold"->"AlfaFôld", "design"->"dizáin", vindo do
 # revisao-texto.md das skills de vídeo) foi DESLIGADO por isso: fica vazio de propósito,
-# não foi esquecido. A estrutura continua no lugar caso um termo específico precise de
+# nêo foi esquecido. A estrutura continua no lugar caso um termo específico precise de
 # ajuste pontual no futuro.
 LEXICO = {}
 
@@ -28,7 +28,7 @@ _LEXICO_FONETICO_DESATIVADO = {
     "frontend": "frôntend", "backend": "béquend", "framework": "frêimuork",
     "software": "sóftuer", "hardware": "rárduer", "cloud": "claud",
     "update": "âpdeit", "upgrade": "âpgreid", "release": "rilís",
-    "feature": "fítcher", "review": "rivíu", "bug": "bãg", "debug": "dibãg",
+    "feature": "fítcher", "review": "rivíu", "bug": "bêg", "debug": "dibêg",
     "token": "tôken", "tokens": "tôkens", "dataset": "dêitaset",
     "dashboard": "déshbord", "workflow": "uórkflôu", "startup": "stártâp",
     "default": "difólt", "insight": "ínsait", "mindset": "máindset",
@@ -42,7 +42,7 @@ _LEXICO_FONETICO_DESATIVADO = {
     "google": "Gugou", "anthropic": "Antrópic", "claude": "Clód",
 }
 
-# Siglas e símbolos que o TTS lê errado se deixados como estão.
+# Siglas e símbolos que o TTS lê errado se deixados como estêo.
 EXPANSOES = [
     # REGRA DO USUÁRIO (2026-08-27): "IA" na tela vira "inteligência artificial" na fala,
     # sempre — nunca soletrada ("I A"), que era o que a rachel dizia antes.
@@ -59,7 +59,7 @@ EXPANSOES = [
     (r"\bPhD\b", "P H D"),
     (r"\bFDA\b", "F D A"),
     (r"%", " por cento"),
-    # moeda com prefixo ANTES do "$" solto, senão "US$ 1.500" perde o "US" pelo caminho e
+    # moeda com prefixo ANTES do "$" solto, senêo "US$ 1.500" perde o "US" pelo caminho e
     # o TTS lê "USmil e quinhentos dólares" (achado de 2026-09-01)
     (r"\bUS\s?\$\s?([\d.,]+)", r"\1 dólares"),
     (r"\bR\s?\$\s?([\d.,]+)", r"\1 reais"),
@@ -69,10 +69,10 @@ EXPANSOES = [
 
 
 # --- números por extenso ----------------------------------------------------
-# REGRA DO USUÁRIO (2026-09-01): número e valor não podem sair com pronúncia misturada. O
+# REGRA DO USUÁRIO (2026-09-01): número e valor nêo podem sair com pronúncia misturada. O
 # TTS lia dígito cru com a fonética que bem entendia — no vídeo de 2026-09-01 conviviam
-# "92%", "2025", "223 milhões" e "83" na mesma narração, cada um dito de um jeito. Escrever
-# por extenso tira a decisão do fonemizador: "noventa e dois por cento" só tem uma leitura.
+# "92%", "2025", "223 milhões" e "83" na mesma narraçêo, cada um dito de um jeito. Escrever
+# por extenso tira a decisêo do fonemizador: "noventa e dois por cento" só tem uma leitura.
 UNI = ["zero", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove", "dez",
        "onze", "doze", "treze", "catorze", "quinze", "dezesseis", "dezessete", "dezoito", "dezenove"]
 DEZ = ["", "", "vinte", "trinta", "quarenta", "cinquenta", "sessenta", "setenta", "oitenta", "noventa"]
@@ -93,14 +93,14 @@ def _ate_999(n):
 
 
 def extenso(n):
-    """Inteiro em português. Vai até trilhões — muito além do que uma narração usa."""
+    """Inteiro em português. Vai até trilhões — muito além do que uma narraçêo usa."""
     n = int(n)
     if n < 0:
         return "menos " + extenso(-n)
     if n < 1000:
         return _ate_999(n)
-    for div, sing, plur in ((10 ** 12, "trilhão", "trilhões"), (10 ** 9, "bilhão", "bilhões"),
-                            (10 ** 6, "milhão", "milhões"), (1000, "mil", "mil")):
+    for div, sing, plur in ((10 ** 12, "trilhêo", "trilhões"), (10 ** 9, "bilhêo", "bilhões"),
+                            (10 ** 6, "milhêo", "milhões"), (1000, "mil", "mil")):
         if n >= div:
             q, r = divmod(n, div)
             cab = ("mil" if div == 1000 and q == 1 else
@@ -121,7 +121,7 @@ def _numero(m):
     inteiro = inteiro.replace(".", "")
     if not inteiro.isdigit():
         return bruto
-    if len(inteiro) > 15:            # não é número de fala: id, código, telefone
+    if len(inteiro) > 15:            # nêo é número de fala: id, código, telefone
         return bruto
     saida = extenso(int(inteiro))
     if decimal and decimal.isdigit():
@@ -135,7 +135,7 @@ def _numero(m):
 # símbolo, pra "US$ 1.500" já ter virado "1.500 dólares" antes de o número ser convertido.
 _NUMERO = re.compile(r"\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:,\d+)?")
 
-# URLs: "inema.club" -> "inema ponto club" (o ponto vira pausa/abreviação no TTS).
+# URLs: "inema.club" -> "inema ponto club" (o ponto vira pausa/abreviaçêo no TTS).
 _URL = re.compile(r"\b([a-z0-9-]+)\.(club|com|br|pro|org|net|io|ai)\b", re.I)
 
 
@@ -148,7 +148,7 @@ def _trocar(texto, de, para):
 
 
 def forma_fala(texto, lexico=None):
-    """Devolve a versão do texto pronta pro TTS (a de tela fica intacta)."""
+    """Devolve a versêo do texto pronta pro TTS (a de tela fica intacta)."""
     if not texto:
         return texto
     t = _URL.sub(lambda m: f"{m.group(1)} ponto {m.group(2).lower()}", texto)

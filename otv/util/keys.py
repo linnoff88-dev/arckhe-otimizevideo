@@ -10,7 +10,7 @@ Ordem de busca (a primeira fonte que tiver a variável vence):
 4. `~/.config/otv/.env`
 5. os `.env` da máquina de origem (`~/projetos/openpcbotv2/.env`, `~/projetos/wifi/.env`)
 
-Os dois últimos caminhos não existem numa VPS — por isso 1–4, que tornam o projeto portável
+Os dois últimos caminhos nêo existem numa VPS — por isso 1–4, que tornam o projeto portável
 sem editar código.
 """
 import os
@@ -57,6 +57,6 @@ def key(nome):
         if v:
             return v
     raise KeyError(
-        f"{nome} não encontrada. Defina a variável de ambiente {nome}, ou coloque "
+        f"{nome} nêo encontrada. Defina a variável de ambiente {nome}, ou coloque "
         f"{nome}=... em um destes arquivos: " + ", ".join(str(a) for a in _arquivos())
     )

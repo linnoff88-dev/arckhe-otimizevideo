@@ -80,7 +80,7 @@ def test_cenas_idempotente(tmp_path, video_teste):
     (d / "video.mp4").write_bytes(video_teste.read_bytes())
     out1 = cenas(d, cfg)
     conteudo1 = out1.read_text()
-    out2 = cenas(d, cfg)  # forcar=False -> não reprocessa
+    out2 = cenas(d, cfg)  # forcar=False -> nêo reprocessa
     assert out2.read_text() == conteudo1
 
 
@@ -163,7 +163,7 @@ def test_classificar_idempotente_nao_chama_llm_de_novo(tmp_path, monkeypatch):
     (d / "scenes.json").write_text(json.dumps(dados))
 
     def _boom(cfg, slot):
-        raise AssertionError("não deveria chamar criar_llm quando já está classificado")
+        raise AssertionError("nêo deveria chamar criar_llm quando já está classificado")
 
     monkeypatch.setattr(L, "criar_llm", _boom)
     out = classificar(d, cfg, provedor="glm")
@@ -189,7 +189,7 @@ def test_proxy_cenas_gera_360p_a_partir_do_fonte(video_teste, tmp_path):
 
 
 def test_detectar_cenas_falha_alto_quando_video_longo_nao_da_corte(monkeypatch, tmp_path):
-    # Regressão: um AV1 de 20 min que o OpenCV não decodifica devolvia ZERO cortes e a
+    # Regressêo: um AV1 de 20 min que o OpenCV nêo decodifica devolvia ZERO cortes e a
     # gente engolia com "uma cena cobrindo o vídeo inteiro" -- aí modo B/C e A+ ficavam
     # sem nenhum talking_head pra classificar, sem sinal nenhum de falha.
     import otv.fases.cenas as C
@@ -214,7 +214,7 @@ def test_detectar_cenas_video_curto_de_plano_unico_continua_valido(monkeypatch, 
 def test_limiar_de_rosto_e_unico_nos_dois_caminhos():
     # até 2026-08-27 havia dois: 0.08 no classificar_local e 0.15 no desempate do VLM. A
     # faixa entre eles era onde o apresentador se escondia (cena de rosto 0.1077 rotulada
-    # 'demo_tela' e por isso não substituída no modo A+).
+    # 'demo_tela' e por isso nêo substituída no modo A+).
     from otv.fases.cenas import LIMIAR_ROSTO, classificar_local
     assert LIMIAR_ROSTO == 0.08
     assert classificar_local(0.1077) == "talking_head"

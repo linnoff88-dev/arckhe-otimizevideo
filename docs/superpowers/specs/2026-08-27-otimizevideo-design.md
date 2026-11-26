@@ -1,15 +1,15 @@
 # otimizevideo — Spec de design
 
-**Data:** 2026-08-27 · **Status:** aguardando revisão do usuário
+**Data:** 2026-08-27 · **Status:** aguardando revisêo do usuário
 
 ## 1. Objetivo
 
-Pegar um vídeo longo (20–30 min: aula, tutorial, palestra, demo) e produzir uma versão enxuta
+Pegar um vídeo longo (20–30 min: aula, tutorial, palestra, demo) e produzir uma versêo enxuta
 (~2 min) que preserve o que importa. A IA transcreve e analisa o conteúdo falado, e — de forma
 barata — o visual, pra decidir o que fica. O corte final é feito por ffmpeg a partir de uma lista
-de tempos (EDL). Cada fase tem provedor trocável por configuração.
+de tempos (EDL). Cada fase tem provedor trocável por configuraçêo.
 
-**O núcleo do projeto é a técnica de seleção (seção 4).** Todo o resto é encanamento.
+**O núcleo do projeto é a técnica de seleçêo (seçêo 4).** Todo o resto é encanamento.
 
 ## 2. Premissas assumidas (defaults — corrigir se estiver errado)
 
@@ -18,9 +18,9 @@ de tempos (EDL). Cada fase tem provedor trocável por configuração.
 | Fonte | URL (YouTube via yt-dlp) ou arquivo local |
 | Idioma | PT-BR predominante; inglês suportado (Whisper detecta) |
 | Ordem de entrega dos modos | A (condensado) → B (sem apresentador) → C (só gráficos/demos) |
-| Duração alvo | 120 s, tolerância ±25 % (parâmetro `--alvo`) |
+| Duraçêo alvo | 120 s, tolerância ±25 % (parâmetro `--alvo`) |
 | Formato de saída | 16:9 igual ao original; 9:16 fica pra depois |
-| Narração (modo B) | inemavox / chatterbox, voz `rachel` (default global) |
+| Narraçêo (modo B) | inemavox / chatterbox, voz `rachel` (default global) |
 | Forma de entrega | CLI Python em fases (`otv`) nesta pasta; skill fina por cima depois |
 | Saída | `~/projetos/output/otimizevideo/<id>/` |
 | Lote | um vídeo por vez (lista/playlist depois) |
@@ -29,7 +29,7 @@ de tempos (EDL). Cada fase tem provedor trocável por configuração.
 ## 3. Arquitetura: o contrato entre fases
 
 Cada fase lê arquivos JSON da pasta de trabalho, chama no máximo um provedor, e escreve um JSON.
-Nenhuma fase conhece o provedor da outra. Tudo é inspecionável e editável à mão entre fases.
+Nenhuma fase conhece o provedor da outra. Tudo é inspecionável e editável à mêo entre fases.
 
 ```
 fonte ─▶ 1 ingest ─▶ video.mp4 · audio.opus · metadata.json
@@ -42,7 +42,7 @@ fonte ─▶ 1 ingest ─▶ video.mp4 · audio.opus · metadata.json
                                        │
         unidades + scenes ─▶ 4 pontuar (LLM, 1 chamada) ─▶ notas.json
                                        │
-        notas + regras + alvo ─▶ 5 selecionar (código) ─▶ plan.json   ◀── edição manual
+        notas + regras + alvo ─▶ 5 selecionar (código) ─▶ plan.json   ◀── ediçêo manual
                                        │
                           6 render (ffmpeg) ─▶ output.mp4
                                        ▲
@@ -56,14 +56,14 @@ fonte ─▶ 1 ingest ─▶ video.mp4 · audio.opus · metadata.json
 **`transcript.json`** — formato compatível com a skill `talking-head-recut`:
 ```json
 {"idioma": "pt", "provedor": "groq/whisper-large-v3-turbo",
- "palavras": [{"t": "então", "ini": 12.34, "fim": 12.61}, …]}
+ "palavras": [{"t": "entêo", "ini": 12.34, "fim": 12.61}, …]}
 ```
 
 **`unidades.json`** — a unidade cortável (frase). Gerada por código, sem modelo.
 ```json
 {"unidades": [
   {"id": 17, "ini": 312.40, "fim": 318.62, "dur": 6.22,
-   "texto": "então o que acontece com a retenção quando a gente muda o gancho",
+   "texto": "entêo o que acontece com a retençêo quando a gente muda o gancho",
    "cena": 41, "visual": "slide"}
 ]}
 ```
@@ -76,13 +76,13 @@ fonte ─▶ 1 ingest ─▶ video.mp4 · audio.opus · metadata.json
    "descricao": null}
 ]}
 ```
-`visual ∈ {talking_head, slide, demo_tela, grafico, outro}`. `rosto_pct` vem da detecção local;
+`visual ∈ {talking_head, slide, demo_tela, grafico, outro}`. `rosto_pct` vem da detecçêo local;
 `descricao` só existe se a fase 3b (VLM) rodou.
 
 **`notas.json`** — saída do LLM, **só ids** (nunca timestamps):
 ```json
 {"provedor": "openrouter/z-ai/glm-5.3-flash",
- "topicos": [{"nome": "gancho e retenção", "de": 12, "ate": 58}],
+ "topicos": [{"nome": "gancho e retençêo", "de": 12, "ate": 58}],
  "notas": [{"id": 17, "nota": 8, "motivo": "define o problema central"}]}
 ```
 
@@ -120,9 +120,9 @@ selecao:
 
 Trocar provedor = mudar uma linha ou passar `--provedor` na fase. Nenhuma outra fase muda.
 
-## 4. A técnica de seleção (núcleo)
+## 4. A técnica de seleçêo (núcleo)
 
-Princípio: **o modelo nunca vê o vídeo; vê texto numerado.** Escolhe por id, não por tempo.
+Princípio: **o modelo nunca vê o vídeo; vê texto numerado.** Escolhe por id, nêo por tempo.
 O tempo é responsabilidade do código, que é determinístico e grátis.
 
 ### 4.1 Unidades cortáveis (fase 2b, código)
@@ -130,34 +130,34 @@ O tempo é responsabilidade do código, que é determinístico e grátis.
 1. Percorre `palavras` em ordem.
 2. Fecha uma unidade quando: a palavra termina com `. ! ?` **ou** a pausa até a próxima palavra
    é ≥ `pausa_fronteira_ms` **ou** a unidade já tem ≥ 12 s (corte forçado na maior pausa interna).
-3. Unidades com < 0,8 s ou < 3 palavras são fundidas com a vizinha anterior.
+3. Unidades com < 0,8 s ou < 3 palavras sêo fundidas com a vizinha anterior.
 4. Cada unidade recebe `cena` (a cena que contém seu ponto médio) e herda `visual` dela.
 
 Resultado: 300–500 unidades num vídeo de 25 min, cada uma com fronteira em pausa natural.
 **Por isso o corte nunca cai no meio de palavra.**
 
-### 4.2 Pontuação (fase 4, uma chamada de LLM)
+### 4.2 Pontuaçêo (fase 4, uma chamada de LLM)
 
 Entrada pro modelo — lista numerada compacta (≈ 8–12k tokens pra 25 min):
 ```
-[017] 6.2s slide      "então o que acontece com a retenção quando a gente muda o gancho"
+[017] 6.2s slide      "entêo o que acontece com a retençêo quando a gente muda o gancho"
 [018] 3.1s demo_tela  "olha aqui no gráfico"
 [019] 9.8s grafico    "a curva cai 40% nos primeiros 3 segundos"
 ```
-Instrução (resumo): *"Este é um vídeo de N min sobre <título>. Vamos condensar em ~2 min no
+Instruçêo (resumo): *"Este é um vídeo de N min sobre <título>. Vamos condensar em ~2 min no
 modo <A|B|C>. Para CADA unidade devolva nota 0–10 de 'quanto isso é essencial pro espectador
 entender o conteúdo' e um motivo de até 10 palavras. Devolva também a lista de tópicos (id
 inicial → id final). Responda só JSON."*
 
 Regras de robustez:
-- Saída validada por schema; ids desconhecidos são descartados; ids faltantes recebem nota 0.
+- Saída validada por schema; ids desconhecidos sêo descartados; ids faltantes recebem nota 0.
 - Se o modelo devolver JSON inválido, 1 retry com a mensagem de erro; depois falha a fase.
 - Modo B/C: o prompt diz explicitamente que unidades `talking_head` valem menos — mas o filtro
-  duro é aplicado na seleção, não confiado ao modelo.
+  duro é aplicado na seleçêo, nêo confiado ao modelo.
 
 Custo: ~10k tokens de entrada + ~4k de saída no glm-5.3-flash ≈ **US$0,002**.
 
-### 4.3 Seleção (fase 5, código puro)
+### 4.3 Seleçêo (fase 5, código puro)
 
 Entrada: `unidades`, `notas`, `scenes`, `config.selecao`, `modo`. Sem modelo.
 
@@ -170,7 +170,7 @@ Entrada: `unidades`, `notas`, `scenes`, `config.selecao`, `modo`. Sem modelo.
    incluindo enquanto `total ≤ alvo × (1 + tolerancia)`.
 4. **Cota por tópico**: nenhum tópico pode ocupar > `cota_topico_pct` do alvo — evita 2 min de um
    assunto só. Unidade que estoura a cota é pulada.
-5. **Fusão de vizinhos**: se `id` e `id+2` entraram e `id+1` tem nota ≥ `nota_minima − 2`, inclui
+5. **Fusêo de vizinhos**: se `id` e `id+2` entraram e `id+1` tem nota ≥ `nota_minima − 2`, inclui
    `id+1` (evita picotado). Depois, unidades adjacentes viram um único segmento.
 6. **Mínimo por segmento**: segmento < `min_segmento_s` é removido (e o tempo liberado volta pro
    passo 3 pra tentar incluir a próxima melhor).
@@ -185,13 +185,13 @@ Saída: `plan.json`. **Mudar alvo, modo ou regras re-roda só esta fase — R$0,
 
 ### 4.4 Modo B — sem o apresentador
 
-1. Seleção com filtro B produz segmentos só visuais, somando `T` segundos.
+1. Seleçêo com filtro B produz segmentos só visuais, somando `T` segundos.
 2. LLM recebe **só o texto** das unidades escolhidas + o texto vizinho (contexto) e escreve uma
-   narração em PT-BR de ~`T × 2,5` palavras (≈150 ppm) dividida por segmento. Uma chamada.
+   narraçêo em PT-BR de ~`T × 2,5` palavras (≈150 ppm) dividida por segmento. Uma chamada.
 3. TTS gera `narracao_<n>.wav` por segmento (inemavox).
-4. Ajuste de duração por segmento, no render, sem chamar modelo:
-   - narração mais curta que o vídeo → mantém vídeo, silêncio no fim;
-   - narração mais longa → `estender_s` = diferença; render aplica `tpad` (freeze do último frame)
+4. Ajuste de duraçêo por segmento, no render, sem chamar modelo:
+   - narraçêo mais curta que o vídeo → mantém vídeo, silêncio no fim;
+   - narraçêo mais longa → `estender_s` = diferença; render aplica `tpad` (freeze do último frame)
      até 3 s, ou `setpts` slow até 1,5× — o que ficar mais natural (freeze pra tela/gráfico
      estático, slow pra demo em movimento).
 5. Áudio original vira cama a −18 dB (ou é removido com `--sem-audio-original`).
@@ -201,12 +201,12 @@ Saída: `plan.json`. **Mudar alvo, modo ou regras re-roda só esta fase — R$0,
 - **3 (local, R$0, sempre roda):** PySceneDetect `AdaptiveDetector` → cortes de cena. Uma
   miniatura 512 px por cena (`ffmpeg -ss … -frames:v 1`). MediaPipe Face Detector na miniatura →
   `rosto_pct` = área da maior caixa / área do frame. Heurística: `rosto_pct ≥ 0,08` → `talking_head`;
-  senão `outro` (a classificação fina vem da 3b ou do texto).
+  senêo `outro` (a classificaçêo fina vem da 3b ou do texto).
 - **3b (VLM, opcional, centavos):** manda as miniaturas em lotes de 20 pro modelo `visual` com a
   pergunta "classifique cada imagem em slide / demo_tela / grafico / talking_head / outro e
   descreva em ≤ 8 palavras". ~150 cenas × ~300 tokens ≈ 45k tokens ≈ US$0,004 no glm-5.3-flash.
 - **3c (vídeo inteiro, opcional):** `visual: gemini_video` manda o `video.mp4` via Files API a 0,5
-  fps e pede a mesma classificação com timestamps. ~US$0,05. Só quando a imagem importa mais que
+  fps e pede a mesma classificaçêo com timestamps. ~US$0,05. Só quando a imagem importa mais que
   a fala (demos silenciosas).
 
 Modo A funciona só com 3. Modos B e C precisam de 3b ou 3c.
@@ -244,7 +244,7 @@ otimizevideo/
   otv.py  config.yaml  requirements.txt  README.md
   otv/  fases/{ingest,transcrever,unidades,cenas,pontuar,selecionar,render,narrar}.py
         provedores/{base,groq_whisper,whisper_local,whisperx,openrouter,gemini_video,inemavox,elevenlabs}.py
-        contratos.py  (dataclasses + validação dos JSONs)   util/{ffmpeg,keys,custos}.py
+        contratos.py  (dataclasses + validaçêo dos JSONs)   util/{ffmpeg,keys,custos}.py
   prompts/{pontuar.md,classificar.md,narrar.md}
   tests/  (fixtures pequenas: transcript sintético, notas sintéticas → plan esperado)
   docs/superpowers/{specs,plans}/   docs/pesquisa-provedores-2026-08-27.md
@@ -255,122 +255,122 @@ otimizevideo/
 
 - Provedor falhou (rede, 5xx, rate limit): 3 tentativas com backoff; depois a fase falha com
   mensagem clara e o `run` para — artefatos anteriores ficam, basta re-rodar.
-- Transcrição vazia ou < 50 palavras: aborta com aviso (vídeo sem fala → só modo C faz sentido).
-- Seleção não atinge 50 % do alvo (tudo com nota baixa): avisa e entrega o que tem; sugere baixar
+- Transcriçêo vazia ou < 50 palavras: aborta com aviso (vídeo sem fala → só modo C faz sentido).
+- Seleçêo nêo atinge 50 % do alvo (tudo com nota baixa): avisa e entrega o que tem; sugere baixar
   `nota_minima`.
 - Modo B sem nenhuma cena visual: aborta com aviso "vídeo é só talking head; use modo A".
 - Arquivo de áudio > limite do provedor: re-encoda a 24k ou fatia em 2 partes com offset.
 
 ## 9. Testes
 
-- **Unitários (sem rede):** `unidades` (fronteiras em pausa/pontuação, fusão de curtas),
-  `selecionar` (mochila, cota, fusão de vizinhos, mínimo por segmento, snap, ordem), parsers de
+- **Unitários (sem rede):** `unidades` (fronteiras em pausa/pontuaçêo, fusêo de curtas),
+  `selecionar` (mochila, cota, fusêo de vizinhos, mínimo por segmento, snap, ordem), parsers de
   cada provedor (fixtures de resposta gravada), montagem do comando ffmpeg.
-- **Integração (com rede, manual):** `otv run` no vídeo de exemplo do usuário; conferir `plan.json`
+- **Integraçêo (com rede, manual):** `otv run` no vídeo de exemplo do usuário; conferir `plan.json`
   antes do render; comparar `--visual local` × `glm` × `gemini_video` no mesmo vídeo.
 - **Critério de aceite do spike:** olhando o `plan.json` do vídeo de exemplo, o usuário concorda
-  que ≥ 70 % dos segmentos escolhidos são "os que ele escolheria".
+  que ≥ 70 % dos segmentos escolhidos sêo "os que ele escolheria".
 
 ## 10. Fora de escopo (por enquanto)
 
-Reframe 9:16, legendas embutidas, lote/playlist, interface web, remoção da pessoa por crop/blur
-dentro do frame (só descarte de cena por enquanto), diarização.
+Reframe 9:16, legendas embutidas, lote/playlist, interface web, remoçêo da pessoa por crop/blur
+dentro do frame (só descarte de cena por enquanto), diarizaçêo.
 
 ## 11. Aprendizados do spike (2026-08-27, vídeo dQYKcjvXhIY, 20 min, inglês)
 
-Spike descartável rodou ingest → Groq → unidades → pontuação → seleção → ffmpeg. Resultado:
+Spike descartável rodou ingest → Groq → unidades → pontuaçêo → seleçêo → ffmpeg. Resultado:
 **1206 s → 113,5 s, 18 segmentos, custo ≈ US$0,03, render 45 s.** Saída em
 `~/projetos/output/otimizevideo/dQYKcjvXhIY/output.mp4`. O que muda no design:
 
-1. **`z-ai/glm-5.3-flash` no OpenRouter não permite desligar reasoning** ("Reasoning is mandatory
-   for this endpoint"). Sem controle, levou > 13 min e não respondeu. Com `reasoning: {effort: "low"}`
+1. **`z-ai/glm-5.3-flash` no OpenRouter nêo permite desligar reasoning** ("Reasoning is mandatory
+   for this endpoint"). Sem controle, levou > 13 min e nêo respondeu. Com `reasoning: {effort: "low"}`
    respondeu em 64 s, US$0,004, JSON válido, 325/325 notas. → O provedor `openrouter` sempre manda
    `reasoning.effort = low` (configurável). `max_tokens` ≥ 20000 pra 325 unidades.
 2. **`google/gemini-2.5-flash-lite`**: 33 s, US$0,006, JSON válido — alternativa de mesmo nível.
    `google/gemini-3.7-flash`: 57 s, US$0,024. `qwen/qwen3.5-flash-02-23` devolveu vazio → fora.
 3. **Concordância entre modelos:** GLM e Gemini-lite escolheram 21 unidades cada, 14 em comum
-   (Jaccard 0,50). O núcleo converge; a borda varia. Não precisa de painel de modelos.
+   (Jaccard 0,50). O núcleo converge; a borda varia. Nêo precisa de painel de modelos.
 4. **Timestamps do Whisper-turbo (Groq) se sobrepõem** entre palavras vizinhas (ex.: unidade N
    começa 0,4 s antes da N−1 terminar). Consequências e correções:
    - `transcrever` normaliza: `ini = max(ini, fim_anterior)`, `fim = max(fim, ini + 0,05)`.
-   - `min_segmento_s` é aplicado **depois** do snap, não antes.
-   - `whisperx` como slot de precisão continua valendo.
-5. **Tempo descartado não volta:** a mochila encheu 150 s de unidades, o filtro de mínimo removeu
-   ~35 s e a saída ficou em 113 s. → Seleção em duas passadas: (a) mochila, (b) fusão/filtro,
+   - `min_segmento_s` é aplicado **depois** do snap, nêo antes.
+   - `whisperx` como slot de precisêo continua valendo.
+5. **Tempo descartado nêo volta:** a mochila encheu 150 s de unidades, o filtro de mínimo removeu
+   ~35 s e a saída ficou em 113 s. → Seleçêo em duas passadas: (a) mochila, (b) fusêo/filtro,
    (c) se `total < alvo × (1 − tolerancia)`, repete a mochila só com candidatos que **estendem
    segmentos existentes** (vizinhos), até fechar o alvo.
-6. **Picotado:** média de 6 s por segmento. → Regra de coesão: depois da mochila, cada segmento é
+6. **Picotado:** média de 6 s por segmento. → Regra de coesêo: depois da mochila, cada segmento é
    estendido pros vizinhos com `nota ≥ nota_minima − 2` até atingir `min_segmento_ideal_s` (8 s),
    se couber no teto. Menos cortes, mais fôlego.
 7. **Gancho:** a unidade 0 ("You've been told that aging is inevitable…") teve nota 7 e ficou de
    fora; o vídeo abriu na unidade 2. → O prompt pede também `"gancho": [ids]` (1–2 unidades que
-   melhor abrem o vídeo) e a seleção força a inclusão do gancho no início.
-8. **Unidades:** 325 unidades, média 3,8 s, fronteiras em pontuação/pausa funcionaram bem —
+   melhor abrem o vídeo) e a seleçêo força a inclusêo do gancho no início.
+8. **Unidades:** 325 unidades, média 3,8 s, fronteiras em pontuaçêo/pausa funcionaram bem —
    nenhum corte no meio de palavra ao ouvir a saída. `fins_segmento` do Whisper ajuda porque as
-   `words` não trazem pontuação; pedir `timestamp_granularities=[word, segment]`.
+   `words` nêo trazem pontuaçêo; pedir `timestamp_granularities=[word, segment]`.
 9. **Ollama local (`qwen3.8:27b`, think off)** funciona como slot `pontuacao: ollama` (R$0): 325/325
-   notas, 408 s (6,8 min) com GPU a 94 %, seleção de 20 segmentos / 131,8 s. Concordância com o GLM:
-   11 de 22 unidades (Jaccard 0,34) — menor que GLM×Gemini (0,50). Vale como fallback offline, não default.
+   notas, 408 s (6,8 min) com GPU a 94 %, seleçêo de 20 segmentos / 131,8 s. Concordância com o GLM:
+   11 de 22 unidades (Jaccard 0,34) — menor que GLM×Gemini (0,50). Vale como fallback offline, nêo default.
 
-## 11b. Ajustes após revisão do usuário no spike (2026-08-27)
+## 11b. Ajustes após revisêo do usuário no spike (2026-08-27)
 
-10. **Onde está o apresentador:** detecção de rosto nos 18 trechos do spike achou o apresentador em 7
+10. **Onde está o apresentador:** detecçêo de rosto nos 18 trechos do spike achou o apresentador em 7
     (trechos 0, 1, 6, 12, 13, 14, 17). O `plan.json` marca cada segmento com `visual` e o usuário decide
-    o que fazer com os `talking_head`. Além de **descartar** (modo B), entra a opção **substituir**:
-    `--substituir gerado` troca a imagem do trecho por uma ilustração gerada (flux2-klein, prompt = a
+    o que fazer com os `talking_head`. Além de **descartar** (modo B), entra a opçêo **substituir**:
+    `--substituir gerado` troca a imagem do trecho por uma ilustraçêo gerada (flux2-klein, prompt = a
     `descricao` do tópico) mantendo o áudio original; `--substituir broll` reaproveita uma cena `outro|demo|grafico`
     do mesmo tópico no próprio vídeo. Fica como modo **A+** (áudio original, sem rosto). Só descartar e
     substituir-por-gerado entram no primeiro plano; `broll` depois.
-11. **Fecho cortado:** a conclusão do vídeo ([319] nota 7 + [320] "As of this year, it is." nota 8) ficou de
+11. **Fecho cortado:** a conclusêo do vídeo ([319] nota 7 + [320] "As of this year, it is." nota 8) ficou de
     fora porque [320] tem 2,1 s e o mínimo por segmento a removeu sem puxar a vizinha. → O prompt devolve
-    também `"fecho": [ids]`; a seleção força gancho no início e fecho no final, e **estende gancho/fecho
+    também `"fecho": [ids]`; a seleçêo força gancho no início e fecho no final, e **estende gancho/fecho
     pros vizinhos** (nota ≥ nota_minima − 3) até cumprir `min_segmento_s`, antes de qualquer filtro.
 12. **Manchete no topo:** o prompt devolve `"manchete"` (≤ 8 palavras). O render escreve a manchete sobre
     os primeiros 4 s (ffmpeg `drawtext`, faixa escura semitransparente no topo, fade in/out), em
     `plan.json → "manchete"`; o usuário pode editar o texto antes de renderizar.
 13. Prompts finais em `prompts/pontuar.md`, `prompts/classificar.md`, `prompts/narrar.md`
-    (versão com manchete/gancho/fecho e escala de notas explícita).
+    (versêo com manchete/gancho/fecho e escala de notas explícita).
 
 14. **Spike "modelo assiste o vídeo inteiro" (2026-08-27):** `z-ai/glm-5.3-flash` via OpenRouter com o vídeo
     em 360p/2 fps (15 MB base64): 124 s, US$0,001, mas só **5.131 tokens de entrada** → ~16 quadros, um a cada
-    77 s. As "cenas" e a "seleção" (16 blocos de 8 s) caíram exatamente na grade de amostragem — timestamps
-    inventados. Sobreposição com o corte por transcrição: IoU 0,05. Acertou o que **aparece** (5 cenas de
+    77 s. As "cenas" e a "seleçêo" (16 blocos de 8 s) caíram exatamente na grade de amostragem — timestamps
+    inventados. Sobreposiçêo com o corte por transcriçêo: IoU 0,05. Acertou o que **aparece** (5 cenas de
     apresentador, gráfico do ECG em 777 s), errou **onde cortar**. Gemini Files API (upload OK, 88 MB/47 s)
-    devolveu 503 em todos os modelos 3.x e os 2.5 estão desligados pra contas novas — provável limite da key.
-    → Decisão firme: **VLM sobre vídeo inteiro só para etiqueta visual (slot `gemini_video`/`glm_video`),
-    nunca para escolher trechos.** Seleção continua por transcrição + ids.
+    devolveu 503 em todos os modelos 3.x e os 2.5 estêo desligados pra contas novas — provável limite da key.
+    → Decisêo firme: **VLM sobre vídeo inteiro só para etiqueta visual (slot `gemini_video`/`glm_video`),
+    nunca para escolher trechos.** Seleçêo continua por transcriçêo + ids.
 15. **`claude_cli`** (Claude Code headless, `claude -p --model sonnet`) verificado: devolve JSON limpo; entra
-    como default pessoal de pontuação/classificação (sai da assinatura, aceita imagens, não aceita vídeo).
+    como default pessoal de pontuaçêo/classificaçêo (sai da assinatura, aceita imagens, nêo aceita vídeo).
 
 ## 12. Custo por vídeo de 25 min (defaults)
 
 | Fase | Custo |
 |---|---|
-| Transcrição Groq | ~US$0,02 |
+| Transcriçêo Groq | ~US$0,02 |
 | Cenas + rosto (local) | R$0 |
-| Classificação VLM (3b) | ~US$0,004 |
-| Pontuação (1 chamada) | ~US$0,002 |
-| Seleção / render / TTS inemavox | R$0 |
+| Classificaçêo VLM (3b) | ~US$0,004 |
+| Pontuaçêo (1 chamada) | ~US$0,002 |
+| Seleçêo / render / TTS inemavox | R$0 |
 | **Total** | **≈ US$0,03** (re-cortes: R$0) |
 
-## 11c. Validação ponta a ponta (Task 12, 2026-08-27, mesmo vídeo `dQYKcjvXhIY`)
+## 11c. Validaçêo ponta a ponta (Task 12, 2026-08-27, mesmo vídeo `dQYKcjvXhIY`)
 
 Rodada com o pipeline completo já implementado (Tasks 1–11 + 10b). Todos os passos do plano
-foram executados; o que segue é o resultado real, não o esperado.
+foram executados; o que segue é o resultado real, nêo o esperado.
 
 ### Resultados por passo
 
 | Passo | Resultado |
 |---|---|
 | 1. `run --modo A --forcar` | 1206 s → **136,6 s em 18 segmentos**. Primeiro segmento contém a unidade 0 (gancho), menor segmento 3,1 s, média 7,6 s. Dentro da faixa 90–150 s. |
-| 2. Custo | **US$0,0023** (OpenRouter, pontuação GLM) + Groq ≈ US$0,02. Bem abaixo do teto de US$0,02 de LLM. |
-| 3. Troca de provedor | `pontuar --provedor gemini` → `selecionar` → `render` rodou sem tocar nas outras fases. **Sobreposição de unidades com o GLM: 44 %** (esperado 50–70 %). Não é falha de código — as fases isolaram corretamente; é divergência de julgamento entre os dois modelos. Registrado como observação: a faixa esperada no plano era otimista. |
-| 4. Modo B | **Funcionou por completo.** `plan.json` com 17 segmentos / 137,7 s contendo **só** `grafico` (9), `demo_tela` (6) e `slide` (2) — nenhum apresentador. `roteiro.md` em PT-BR, 17 wavs em `narracao/`, `output.mp4` de 151,2 s (137,7 s do plano + 13,3 s de extensão para caber a narração). O aviso "vídeo é só talking head, use modo A" **não** disparou. |
-| 5. Re-corte manual | Segmento removido à mão do `plan.json` + `render`: saída refletiu a edição (135,3 s) e o `custos.json` **não ganhou nenhuma entrada nova** — zero chamadas de modelo. |
-| 12b. `--substituir gerado` | 4 segmentos `talking_head` (0, 6, 14, 16) trocados por ilustração flux-2-klein; áudio original preservado; `status` marca os quatro com `→img`. |
+| 2. Custo | **US$0,0023** (OpenRouter, pontuaçêo GLM) + Groq ≈ US$0,02. Bem abaixo do teto de US$0,02 de LLM. |
+| 3. Troca de provedor | `pontuar --provedor gemini` → `selecionar` → `render` rodou sem tocar nas outras fases. **Sobreposiçêo de unidades com o GLM: 44 %** (esperado 50–70 %). Nêo é falha de código — as fases isolaram corretamente; é divergência de julgamento entre os dois modelos. Registrado como observaçêo: a faixa esperada no plano era otimista. |
+| 4. Modo B | **Funcionou por completo.** `plan.json` com 17 segmentos / 137,7 s contendo **só** `grafico` (9), `demo_tela` (6) e `slide` (2) — nenhum apresentador. `roteiro.md` em PT-BR, 17 wavs em `narracao/`, `output.mp4` de 151,2 s (137,7 s do plano + 13,3 s de extensêo para caber a narraçêo). O aviso "vídeo é só talking head, use modo A" **nêo** disparou. |
+| 5. Re-corte manual | Segmento removido à mêo do `plan.json` + `render`: saída refletiu a ediçêo (135,3 s) e o `custos.json` **nêo ganhou nenhuma entrada nova** — zero chamadas de modelo. |
+| 12b. `--substituir gerado` | 4 segmentos `talking_head` (0, 6, 14, 16) trocados por ilustraçêo flux-2-klein; áudio original preservado; `status` marca os quatro com `→img`. |
 | 12c. Fecho | Último segmento do plano final = unidades `[327, 328]` = exatamente o `fecho` das notas. Gancho idem no primeiro segmento. |
 
-### Custo total da validação inteira
+### Custo total da validaçêo inteira
 
 `US$0,0152` no OpenRouter + 4 imagens no fal + Groq ≈ US$0,02. As fases mais caras foram
 **classificar** (378 cenas em 19 lotes de miniaturas, US$0,0099, 195 s) e **pontuar**
@@ -380,19 +380,19 @@ foram executados; o que segue é o resultado real, não o esperado.
 
 1. **Render travava o host.** O `montar_filtro` original punha N `[0:v]trim` sobre um único
    input: o ffmpeg decodifica o arquivo linearmente e empilha os quadros crus dos ramos que o
-   `concat` ainda não consumiu — 60,9 GB de RSS e a máquina sem responder (reboot às 06:31).
+   `concat` ainda nêo consumiu — 60,9 GB de RSS e a máquina sem responder (reboot às 06:31).
    Corrigido com **um input por segmento** (`-ss`/`-t` na entrada) + `MemoryMax` via
    `systemd-run` no `run()`. Pico depois do fix no mesmo vídeo: **2,9 GB**, render em 21 s.
-2. **Detecção de cena devolvia UMA cena para o vídeo inteiro.** O OpenCV que o PySceneDetect
-   usa não decodifica AV1 — que é o que o yt-dlp entrega em 1080p. O fallback silencioso
-   `[(0, duração)]` deixava modo B/C e A+ sem nada para classificar. Corrigido detectando num
+2. **Detecçêo de cena devolvia UMA cena para o vídeo inteiro.** O OpenCV que o PySceneDetect
+   usa nêo decodifica AV1 — que é o que o yt-dlp entrega em 1080p. O fallback silencioso
+   `[(0, duraçêo)]` deixava modo B/C e A+ sem nada para classificar. Corrigido detectando num
    **proxy 360p H.264** gerado pelo ffmpeg (mesmo vídeo: 1 → **378 cenas**), e um vídeo de mais
    de 2 min sem nenhum corte agora **levanta erro** em vez de ser engolido.
-3. **`pontuar` reaproveitava notas de outro modo.** O prompt muda com o modo, então
+3. **`pontuar` reaproveitava notas de outro modo.** O prompt muda com o modo, entêo
    `run --modo B` sobre uma pasta já pontuada em modo A pulava a fase e validava o modo B com
    julgamento do modo A. Agora só pula quando o modo bate.
 
-Mais uma, específica da 10b: o prompt da ilustração vinha da **descrição da cena**, que num
+Mais uma, específica da 10b: o prompt da ilustraçêo vinha da **descriçêo da cena**, que num
 trecho `talking_head` descreve o próprio apresentador — o flux devolvia outro apresentador,
 com letreiro garrancho. O assunto passou a vir da **fala** do segmento.
 
@@ -403,15 +403,15 @@ Depois de assistir os dois primeiros vídeos, o usuário pediu cinco coisas. O q
 
 | Pedido | O que foi feito |
 |---|---|
-| Manchete editorial "tipo capa de revista", cobrindo parte do quadro | A manchete em `drawtext` (uma linha, DejaVu, tarja preta) foi substituída por uma **composição HyperFrames**: caixa alta em Sora 800 a 148 px, faixa âmbar, véu em gradiente cobrindo a esquerda do quadro. `drawtext` não sustenta várias linhas com hierarquia — cada quebra vira um filtro separado, sem entrelinha e sem como conferir antes de renderizar. |
-| Chamada de 10–15 s antes do conteúdo, sem mexer no corte | Fase `abertura`: 3 blocos (capa + 2 promessas), b-roll tirado de **cenas que não entraram no corte** (não queima o que a pessoa vai ver), texto garrafal e narração. Saiu com **12,2 s**. Soma ao alvo em vez de dividir. |
+| Manchete editorial "tipo capa de revista", cobrindo parte do quadro | A manchete em `drawtext` (uma linha, DejaVu, tarja preta) foi substituída por uma **composiçêo HyperFrames**: caixa alta em Sora 800 a 148 px, faixa âmbar, véu em gradiente cobrindo a esquerda do quadro. `drawtext` nêo sustenta várias linhas com hierarquia — cada quebra vira um filtro separado, sem entrelinha e sem como conferir antes de renderizar. |
+| Chamada de 10–15 s antes do conteúdo, sem mexer no corte | Fase `abertura`: 3 blocos (capa + 2 promessas), b-roll tirado de **cenas que nêo entraram no corte** (nêo queima o que a pessoa vai ver), texto garrafal e narraçêo. Saiu com **12,2 s**. Soma ao alvo em vez de dividir. |
 | CTA fixo no fim | `assets/cta.mp4`, card "SIGA O CANAL" de 4,6 s, narrado. Colado por `costurar()` em todo render. |
-| Voz original sai quando há dublagem | O default virou mudo; `--com-cama` traz a cama a −18 dB de volta. Fala a −18 dB continua inteligível e briga com a narração — a cama só faz sentido pra música/ambiência. |
-| Definir a voz | `voz: rachel` e `tts_engine: chatterbox` no `config.yaml` (era o default do código, não estava exposto). |
+| Voz original sai quando há dublagem | O default virou mudo; `--com-cama` traz a cama a −18 dB de volta. Fala a −18 dB continua inteligível e briga com a narraçêo — a cama só faz sentido pra música/ambiência. |
+| Definir a voz | `voz: rachel` e `tts_engine: chatterbox` no `config.yaml` (era o default do código, nêo estava exposto). |
 
 Mais o **modo N**, criado nesta rodada: mantém o vídeo inteiro na tela e reescreve a fala com
-fluência (`prompts/narrar_n.md` proíbe acrescentar fato). Não depende de classificação visual e
-usa teto de congelamento de 6 s — o quadro congela esperando a narração terminar em vez de a
+fluência (`prompts/narrar_n.md` proíbe acrescentar fato). Nêo depende de classificaçêo visual e
+usa teto de congelamento de 6 s — o quadro congela esperando a narraçêo terminar em vez de a
 frase ser truncada.
 
 ### O que veio das skills `video-explicativo` / `videoprodutor`
@@ -422,13 +422,13 @@ Ler essas duas skills antes de implementar evitou reinventar quatro coisas e rev
    `lint` e `check` que acusam contrato quebrado antes do render. É o motor da capa, da chamada e
    do CTA.
 2. **`fetch-fonts.mjs`** — baixa as `.woff2` e embute `@font-face` local. Google Fonts por
-   `<link>` não funciona no render headless (o `lint` reprova).
+   `<link>` nêo funciona no render headless (o `lint` reprova).
 3. **`house-style.md`** — a identidade já estava especificada: `#0D1321` de fundo, âmbar `#FFC300`
-   como accent único, Sora 700–800 em 72–172 px. Não foi invenção desta rodada.
+   como accent único, Sora 700–800 em 72–172 px. Nêo foi invençêo desta rodada.
 4. **`revisao-texto.md` — o defeito.** Cada frase tem duas formas: a de tela (grafia original) e a
    de fala (termo em inglês reescrito foneticamente, sigla e URL expandidas). O primeiro dublado
    mandava o roteiro **cru** pro TTS, num vídeo cheio de `AlphaFold`, `DeepMind` e `Nature
-   Medicine`. Virou `otv/util/fala.py`, código determinístico e testável em vez de instrução de
+   Medicine`. Virou `otv/util/fala.py`, código determinístico e testável em vez de instruçêo de
    prompt.
 
 ### Armadilhas do contrato do HyperFrames (custaram render)
@@ -436,6 +436,6 @@ Ler essas duas skills antes de implementar evitou reinventar quatro coisas e rev
 - Um tween de ambiente mais longo que o total faz o vídeo inteiro durar o tween: um `duration:14`
   num card de 4,6 s rendeu **14 s**, com 9,4 s de card parado. O framework usa `tl.duration()`
   como fim.
-- `<video>` não pode ficar dentro de um elemento que também tem `data-start` — o extrator resolve
+- `<video>` nêo pode ficar dentro de um elemento que também tem `data-start` — o extrator resolve
   o start do vídeo sem o offset do ancestral e o clipe mostra o quadro errado.
-- `<video>` com `data-start` precisa de `id` (senão sai congelado) e de `muted`.
+- `<video>` com `data-start` precisa de `id` (senêo sai congelado) e de `muted`.

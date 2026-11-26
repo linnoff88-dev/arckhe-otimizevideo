@@ -3,8 +3,8 @@ from pathlib import Path
 from otv.util.keys import key
 
 def normalizar_palavras(palavras):
-    # Nota: ini/fim são arredondados a cada palavra ANTES da checagem do gap mínimo
-    # (e não depois) porque round(x, 3) pode ficar a um ULP abaixo do valor bruto
+    # Nota: ini/fim sêo arredondados a cada palavra ANTES da checagem do gap mínimo
+    # (e nêo depois) porque round(x, 3) pode ficar a um ULP abaixo do valor bruto
     # ini + 0.05 (ex.: round(1.85+0.05, 3) == 1.9, mas 1.9 < 1.85+0.05 em float
     # puro). Arredondar antes e revalidar o invariante no domínio já arredondado
     # evita esse falso-negativo de ponto flutuante sem mudar a semântica do gap.

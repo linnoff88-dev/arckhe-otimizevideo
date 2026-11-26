@@ -15,7 +15,7 @@ def test_remover_segmento_recalcula_total():
 
 
 def test_editar_in_out_preserva_campos_do_pipeline():
-    """A tela só manda in/out/incluir — unidades, visual e substituir não podem sumir."""
+    """A tela só manda in/out/incluir — unidades, visual e substituir nêo podem sumir."""
     n = aplicar(BASE, {"segmentos": [{"i": 0, "in": 2.0, "out": 8.0, "incluir": True}]})
     s = n["segmentos"][0]
     assert (s["in"], s["out"]) == (2.0, 8.0)
@@ -24,7 +24,7 @@ def test_editar_in_out_preserva_campos_do_pipeline():
 
 
 def test_campo_desconhecido_e_ignorado():
-    """Um POST não pode injetar chave nova nem sobrescrever o que o pipeline calculou."""
+    """Um POST nêo pode injetar chave nova nem sobrescrever o que o pipeline calculou."""
     n = aplicar(BASE, {"segmentos": [{"i": 0, "incluir": True, "visual": "grafico",
                                       "texto": "hackeado", "malicioso": 1}]})
     s = n["segmentos"][0]
